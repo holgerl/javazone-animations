@@ -42,7 +42,7 @@ function main() {
 
 	var grid = new THREE.LineSegments(geometry, material);
 	//grid.rotation.y = Math.PI / 4;
-	scene.add(grid);
+	//scene.add(grid);
 
 	var linePoints = [
 		new THREE.Vector3(0,0,0),
@@ -115,6 +115,30 @@ function makeGeometry() {
 	return geometry;
 }
 
+function makePolygon(polygonPoints, material) {
+	var material = material || new THREE.MeshBasicMaterial({
+		color: 0x1D1D1D,
+		side: THREE.DoubleSide
+	});
+
+	var geometry = new THREE.Geometry();
+
+	for (var i in polygonPoints) {
+		var point = polygonPoints[i];
+		geometry.vertices.push(point);
+		if (i % 3 == 2) {
+			geometry.faces.push(new THREE.Face3(i-2, i-1, i));
+		}
+	}
+
+	geometry.verticesNeedUpdate = true;
+	geometry.computeBoundingSphere();
+
+	var polygon = new THREE.Mesh(geometry, material);
+
+	return polygon;
+}
+
 function makeExtendedLinesMesh(linePoints, isClosedLoop, fragmentShader) {
 	var fragmentShader = fragmentShader || document.getElementById('fragmentshader').textContent;
 	var isClosedLoop = isClosedLoop || false;
@@ -126,6 +150,9 @@ function makeExtendedLinesMesh(linePoints, isClosedLoop, fragmentShader) {
 		vertexShader: document.getElementById('extendedVertexshader').textContent,
 		fragmentShader: fragmentShader,
 		side: THREE.DoubleSide,
+		//polygonOffset: true,
+        //polygonOffsetFactor: -2.0,
+        //polygonOffsetUnits: -8.0
 		//wireframe: true
 	});
 
@@ -213,14 +240,14 @@ function animate() {
 
 	var relativeTime = (new Date().getTime() - timeStart) / 1000;
 
-	var cameraSpeed = 1/10;
+	var cameraSpeed = 0;//1/10;
 
 	if (!window.mouseState.mouseDown) {
 		window.uniforms.time.value = relativeTime;
 		camera.position.set(5*Math.sin(relativeTime*cameraSpeed), 2, 5*Math.cos(relativeTime*cameraSpeed))
 	} else {
 		var diff = window.mouseState.mousePosition.clone().sub(window.mouseState.mouseDownPosition);
-		diff.multiplyScalar(1/200);
+		diff.multiplyScalar(1/50);
 		var time = window.uniforms.time.value;
 		camera.position.set(5*Math.sin(time - diff.x), 2, 5*Math.cos(time - diff.y))
 	}
@@ -254,28 +281,49 @@ function flattenVectorArray(array) {
 function makeJavaZoneLogo() {
 	var logo = new THREE.Object3D();
 
-	var top1 = [
+	var topLines1 = [
 		new THREE.Vector3(0, 1, 0),
-		new THREE.Vector3(1, 1.5, 0),
-		new THREE.Vector3(-1, 0, 1),
+		new THREE.Vector3(1.25, 1.25, 0),
+		new THREE.Vector3(-0.75, 0, 1),
 	];
-	logo.add(makeExtendedLinesMesh(top1, true));
+	logo.add(makeExtendedLinesMesh(topLines1, true));
 
+	logo.add(makePolygon(topLines1));
 
-	var side1 = [
-		new THREE.Vector3(1, 1.5, 0),
-		new THREE.Vector3(1, 0, 0),
-		new THREE.Vector3(-1, 0, 1)
+	var sideLines1 = [
+		new THREE.Vector3(1.25, 1.25, 0),
+		new THREE.Vector3(1.25, 0, -0.5),
+		new THREE.Vector3(-0.75, 0, 1)
 	];
-	logo.add(makeExtendedLinesMesh(side1, true));
+	logo.add(makeExtendedLinesMesh(sideLines1, true));
 
-
-	var top2 = [
-		new THREE.Vector3(-1, 1.5, -1),
-		new THREE.Vector3(0.5, 1, 0),
+	var topLines2 = [
+		new THREE.Vector3(-1, 1.25, -1),
+		new THREE.Vector3(0.5, 0.75, 0),
 		new THREE.Vector3(1, 0, 1)
 	];
-	logo.add(makeExtendedLinesMesh(top2, true));
+	logo.add(makeExtendedLinesMesh(topLines2, true));
+
+	logo.add(makePolygon(topLines2));
+
+	var sideLines2 = [
+		new THREE.Vector3(-1, 1.25, -1),
+		new THREE.Vector3(1, 0, 1),
+		new THREE.Vector3(0.5, 0, 1),
+		new THREE.Vector3(0, 0, 0.5)
+	];
+	logo.add(makeExtendedLinesMesh(sideLines2, true));
+
+	var sidePlane2 = [
+		new THREE.Vector3(-1, 1.25, -1),
+		new THREE.Vector3(1, 0, 1),
+		new THREE.Vector3(0.5, 0, 1),
+		new THREE.Vector3(-1, 1.25, -1),
+		new THREE.Vector3(0.5, 0, 1),
+		new THREE.Vector3(0, 0, 0.5)
+	];
+	
+	logo.add(makePolygon(sidePlane2));
 
 	return logo;
 }

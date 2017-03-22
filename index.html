@@ -38,7 +38,7 @@
 
     			vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
-    			float thickness = 0.1;
+    			float thickness = 0.05;
 
 				vec4 previousScreen4D = projectionMatrix * modelViewMatrix * vec4(previousPosition, 1.0);
 				vec2 previousScreen = previousScreen4D.xy / previousScreen4D.w;
