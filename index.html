@@ -22,6 +22,10 @@
 				return length(cross(lineEnd - lineStart, lineStart - point));
 			}
 
+			vec2 perpendicular(vec2 v) {
+				return vec2(-v.y, v.x);
+			}
+
 			uniform float time;
 			varying float hue;
 			attribute float extensionDirection;
@@ -34,23 +38,31 @@
 
     			vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
-    			float thickness = 0.05;
+    			float thickness = 0.1;
 
 				vec4 previousScreen4D = projectionMatrix * modelViewMatrix * vec4(previousPosition, 1.0);
-				vec2 previousScreen = previousScreen4D.xy / previousScreen4D.w;  // TODO: Do this?
+				vec2 previousScreen = previousScreen4D.xy / previousScreen4D.w;
 				vec4 nextScreen4D = projectionMatrix * modelViewMatrix * vec4(nextPosition, 1.0);
-				vec2 nextScreen = nextScreen4D.xy / nextScreen4D.w;  // TODO: Do this?
-				vec2 currentScreen = currentProjected.xy / currentProjected.w;  // TODO: Do this?
+				vec2 nextScreen = nextScreen4D.xy / nextScreen4D.w;
+				vec2 currentScreen = currentProjected.xy / currentProjected.w;
 
 				vec2 dirBackward = normalize(currentScreen - previousScreen);
 				vec2 dirForward = normalize(nextScreen - currentScreen);
 				vec2 dirTangent = normalize(dirForward + dirBackward);
-				vec2 miter = vec2(-dirTangent.y, dirTangent.x);
-				vec2 normal = vec2(-dirForward.y, dirForward.x);
+				vec2 miter = perpendicular(dirTangent);
+				vec2 normal = perpendicular(dirForward);
 
-				float length = 1.0 / max(0.2, dot(miter, normal));
+				float miterLength = 1.0 / max(0.2, dot(miter, normal));
 
-				vec2 offset = miter * thickness/2.0 * extensionDirection * length;
+				if (currentScreen == previousScreen) { // At start of line segments
+					miter = perpendicular(dirForward);
+					miterLength = 1.0;
+				} else if (nextScreen == currentScreen) { // At end of line segments
+					miter = perpendicular(dirBackward);
+					miterLength = 1.0;
+				}
+
+				vec2 offset = miter * thickness/2.0 * extensionDirection * miterLength;
 				gl_Position = currentProjected + vec4(offset, 0.0, 0.0);
 			}
 		</script>

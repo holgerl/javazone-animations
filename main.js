@@ -142,7 +142,7 @@ function makeExtendedGeometry() {
 	
 	positions.push(p00, p01);
 	extensionDirections.push(-1, 1);
-	previousPositions.push(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)); // TODO: Is this a problem when first linePoint is (0,0,0)?
+	previousPositions.push(p00, p01); // Previous point is the point itself at start of line
 
 	for (var i in linePoints) {
 		if (i == 0) continue;
@@ -167,11 +167,11 @@ function makeExtendedGeometry() {
 		previousPositions.push(p00, p01);
 	}
 
-	nextPositions.push(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)); // TODO: Is this a problem when last linePoint is (0,0,0)?
+	nextPositions.push(linePoints[linePoints.length-1].clone(), linePoints[linePoints.length-1].clone()); // Next point is the point itself at end of line
 
-	var flatPositions = [].concat.apply([], positions.map(v => [v.x, v.y, v.z]));
-	var flatNextPositions = [].concat.apply([], nextPositions.map(v => [v.x, v.y, v.z]));
-	var flatPreviousPositions = [].concat.apply([], previousPositions.map(v => [v.x, v.y, v.z]));
+	var flatPositions = flattenVectorArray(positions);
+	var flatNextPositions = flattenVectorArray(nextPositions);
+	var flatPreviousPositions = flattenVectorArray(previousPositions);
 
 	geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 	geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(flatPositions), 3));
@@ -213,4 +213,8 @@ function setupParameters() {
 	window.parameters = new Parameters();
 	var gui = new dat.GUI();
 	gui.add({fireEvent: handleEvent},'fireEvent');
+}
+
+function flattenVectorArray(array) {
+	return [].concat.apply([], array.map(v => [v.x, v.y, v.z]));
 }
