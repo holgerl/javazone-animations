@@ -56,7 +56,7 @@ function main() {
 	];
 
 	var lines = makeExtendedLinesMesh(linePoints);
-	scene.add(lines);
+	//scene.add(lines);
 	lines.position.setY(-1);
 
 	var logo = makeJavaZoneLogo();
@@ -65,13 +65,7 @@ function main() {
 
 	setupParameters();
 
-	renderer.domElement.addEventListener("mousedown", function(e) {
-		window.mouseDown = true;
-	});
-
-	renderer.domElement.addEventListener("mouseup", function(e) {
-		window.mouseDown = false;
-	});
+	setupMouseEvents(renderer.domElement);
 
 	animate();
 }
@@ -217,12 +211,20 @@ function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 function animate() {
 	requestAnimationFrame(animate);
 
-	// relativeTime /= 10;
-	if (!window.mouseDown) window.uniforms.time.value = (new Date().getTime() - timeStart) / 1000;
+	var relativeTime = (new Date().getTime() - timeStart) / 1000;
 
-	var time = window.uniforms.time.value;
+	var cameraSpeed = 1/10;
 
-	camera.position.set(5*Math.sin(time), 2, 5*Math.cos(time))
+	if (!window.mouseState.mouseDown) {
+		window.uniforms.time.value = relativeTime;
+		camera.position.set(5*Math.sin(relativeTime*cameraSpeed), 2, 5*Math.cos(relativeTime*cameraSpeed))
+	} else {
+		var diff = window.mouseState.mousePosition.clone().sub(window.mouseState.mouseDownPosition);
+		diff.multiplyScalar(1/200);
+		var time = window.uniforms.time.value;
+		camera.position.set(5*Math.sin(time - diff.x), 2, 5*Math.cos(time - diff.y))
+	}
+
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 	render();
@@ -252,13 +254,47 @@ function flattenVectorArray(array) {
 function makeJavaZoneLogo() {
 	var logo = new THREE.Object3D();
 
-	var top = [
+	var top1 = [
 		new THREE.Vector3(0, 1, 0),
-		new THREE.Vector3(0, 1.5, 1),
-		new THREE.Vector3(-1, 0, -1),
+		new THREE.Vector3(1, 1.5, 0),
+		new THREE.Vector3(-1, 0, 1),
 	];
+	logo.add(makeExtendedLinesMesh(top1, true));
 
-	logo.add(makeExtendedLinesMesh(top, true));
+
+	var side1 = [
+		new THREE.Vector3(1, 1.5, 0),
+		new THREE.Vector3(1, 0, 0),
+		new THREE.Vector3(-1, 0, 1)
+	];
+	logo.add(makeExtendedLinesMesh(side1, true));
+
+
+	var top2 = [
+		new THREE.Vector3(-1, 1.5, -1),
+		new THREE.Vector3(0.5, 1, 0),
+		new THREE.Vector3(1, 0, 1)
+	];
+	logo.add(makeExtendedLinesMesh(top2, true));
 
 	return logo;
+}
+
+function setupMouseEvents(domElement) {
+	window.mouseState = {};
+
+	domElement.addEventListener("mousedown", function(e) {
+		window.mouseState.mouseDown = true;
+		var position = new THREE.Vector2(e.clientX, e.clientX);
+		window.mouseState.mouseDownPosition = position;
+		window.mouseState.mousePosition = position;
+	});
+
+	domElement.addEventListener("mouseup", function(e) {
+		window.mouseState.mouseDown = false;
+	});
+
+	domElement.addEventListener("mousemove", function(e) {
+		window.mouseState.mousePosition = new THREE.Vector2(e.clientX, e.clientX);
+	});
 }
