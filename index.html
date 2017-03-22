@@ -17,6 +17,27 @@
 		</style>
 	</head>
 	<body>
+		<script type="x-shader/x-vertex" id="extendedVertexshader">
+			float pointLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
+				return length(cross(lineEnd - lineStart, lineStart - point));
+			}
+
+			uniform float time;
+			varying float hue;
+			attribute float miter; // TODO: Make normal an attribute instead
+
+			void main() {
+				hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
+				hue /= 15.0;
+
+    			float thickness = 0.05;
+    			vec3 normal = normalize(vec3(1.0, 1.0, 1.0));
+				vec3 extendedPosition = position.xyz + vec3(normal * thickness/2.0 * miter);
+
+				vec4 mvPosition = modelViewMatrix * vec4(extendedPosition, 1.0);
+    			gl_Position = projectionMatrix * mvPosition;
+			}
+		</script>
 		<script type="x-shader/x-vertex" id="vertexshader">
 			float pointLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
 				return length(cross(lineEnd - lineStart, lineStart - point));
@@ -28,7 +49,10 @@
 			void main() {
 				hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
 				hue /= 15.0;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+				vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+    			gl_Position = projectionMatrix * mvPosition;
 			}
 		</script>
 		<script type="x-shader/x-fragment" id="fragmentshader">
