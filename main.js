@@ -56,15 +56,19 @@ function main() {
 	];
 
 	var lines = makeExtendedLinesMesh(linePoints);
-
 	scene.add(lines);
+	lines.position.setY(-1);
+
+	var logo = makeJavaZoneLogo();
+	//logo.position.setY(1);
+	scene.add(logo);
 
 	setupParameters();
 
 	renderer.domElement.addEventListener("mousedown", function(e) {
 		window.mouseDown = true;
 	});
-	
+
 	renderer.domElement.addEventListener("mouseup", function(e) {
 		window.mouseDown = false;
 	});
@@ -117,10 +121,11 @@ function makeGeometry() {
 	return geometry;
 }
 
-function makeExtendedLinesMesh(linePoints, fragmentShader) {
-	var geometry = makeExtendedLinesGeometry(linePoints);
-
+function makeExtendedLinesMesh(linePoints, isClosedLoop, fragmentShader) {
 	var fragmentShader = fragmentShader || document.getElementById('fragmentshader').textContent;
+	var isClosedLoop = isClosedLoop || false;
+
+	var geometry = makeExtendedLinesGeometry(linePoints, isClosedLoop);
 
 	var material = new THREE.ShaderMaterial({
 		uniforms: uniforms,
@@ -135,19 +140,24 @@ function makeExtendedLinesMesh(linePoints, fragmentShader) {
 	return lines;
 }
 
-function makeExtendedLinesGeometry(linePoints) {
+function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 	var positions = [];
 	var indices = [];
 	var nextPositions = [];
 	var previousPositions = [];
 	var extensionDirections = [];
 
-	var p00 = linePoints[0].clone();
-	var p01 = linePoints[0].clone();
+	var firstPoint = linePoints[0];
+	var lastPoint = linePoints[linePoints.length-1];
 	
-	positions.push(p00, p01);
+	positions.push(firstPoint.clone(), firstPoint.clone());
 	extensionDirections.push(-1, 1);
-	previousPositions.push(p00, p01); // Previous point is the point itself at start of line
+	
+	if (isClosedLoop) {
+		previousPositions.push(lastPoint.clone(), lastPoint.clone());
+	} else {
+		previousPositions.push(firstPoint.clone(), firstPoint.clone()); // Previous point is the point itself at start of line
+	}
 
 	for (var i in linePoints) {
 		if (i == 0) continue;
@@ -172,7 +182,20 @@ function makeExtendedLinesGeometry(linePoints) {
 		previousPositions.push(p00, p01);
 	}
 
-	nextPositions.push(linePoints[linePoints.length-1].clone(), linePoints[linePoints.length-1].clone()); // Next point is the point itself at end of line
+	if (isClosedLoop) {
+		var i = linePoints.length;
+		var i00 = 2*i - 2;
+		var i01 = 2*i - 1;
+		var i10 = 0;
+		var i11 = 1;
+
+		indices.push(i00, i10, i11);
+		indices.push(i00, i11, i01);
+
+		nextPositions.push(firstPoint.clone(), firstPoint.clone());
+	} else {
+		nextPositions.push(lastPoint.clone(), lastPoint.clone()); // Next point is the point itself at end of line
+	}
 
 	var flatPositions = flattenVectorArray(positions);
 	var flatNextPositions = flattenVectorArray(nextPositions);
@@ -224,4 +247,18 @@ function setupParameters() {
 
 function flattenVectorArray(array) {
 	return [].concat.apply([], array.map(v => [v.x, v.y, v.z]));
+}
+
+function makeJavaZoneLogo() {
+	var logo = new THREE.Object3D();
+
+	var top = [
+		new THREE.Vector3(0, 1, 0),
+		new THREE.Vector3(0, 1.5, 1),
+		new THREE.Vector3(-1, 0, -1),
+	];
+
+	logo.add(makeExtendedLinesMesh(top, true));
+
+	return logo;
 }
