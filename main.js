@@ -2,7 +2,7 @@
 
 var timeStart = new Date().getTime();
 
-function main() {
+function boilerPlate() {
 	var renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setClearColor(0x1D1D1D);
 	renderer.domElement.setAttribute('id', 'renderer');
@@ -21,10 +21,13 @@ function main() {
 	window.renderer = renderer;
 	window.scene = scene;
 	window.camera = camera;
+}
+
+function main() {
+	boilerPlate();
 
 	var uniforms = {
-		time: {value: 0.0},
-		blinkTime: {value: 0.0}
+		time: {value: 0.0}
 	};
 	window.uniforms = uniforms;
 
@@ -36,35 +39,32 @@ function main() {
 		fragmentShader: document.getElementById('fragmentshader').textContent,
 		side: THREE.DoubleSide
 	});
-	window.uniforms = uniforms;
 
 	var grid = new THREE.LineSegments(geometry, material);
 	//grid.rotation.y = Math.PI / 4;
 	scene.add(grid);
 
-	//--
+	var linePoints = [
+		new THREE.Vector3(0,0,0),
+		new THREE.Vector3(0,1,0),
+		new THREE.Vector3(1,1,0),
+		new THREE.Vector3(0,1,1),
+		new THREE.Vector3(-1,1,0),
+		new THREE.Vector3(-2,1,1),
+		new THREE.Vector3(-2,0,1),
+		new THREE.Vector3(-2,0,0)
+	];
 
-	var geometry = makeExtendedGeometry();
-	window.uniforms = uniforms;
+	var lines = makeExtendedLinesMesh(linePoints);
 
-	var material = new THREE.ShaderMaterial({
-		uniforms: uniforms,
-		vertexShader: document.getElementById('extendedVertexshader').textContent,
-		fragmentShader: document.getElementById('fragmentshader').textContent,
-		side: THREE.DoubleSide,
-		//wireframe: true
-	});
-
-	var lines = new THREE.Mesh(geometry, material);
 	scene.add(lines);
-
-	//--
 
 	setupParameters();
 
 	renderer.domElement.addEventListener("mousedown", function(e) {
 		window.mouseDown = true;
 	});
+	
 	renderer.domElement.addEventListener("mouseup", function(e) {
 		window.mouseDown = false;
 	});
@@ -117,20 +117,25 @@ function makeGeometry() {
 	return geometry;
 }
 
-function makeExtendedGeometry() {
-	var geometry = new THREE.BufferGeometry();
+function makeExtendedLinesMesh(linePoints, fragmentShader) {
+	var geometry = makeExtendedLinesGeometry(linePoints);
 
-	var linePoints = [
-		new THREE.Vector3(0,0,0),
-		new THREE.Vector3(0,1,0),
-		new THREE.Vector3(1,1,0),
-		new THREE.Vector3(0,1,1),
-		new THREE.Vector3(-1,1,0),
-		new THREE.Vector3(-2,1,1),
-		new THREE.Vector3(-2,0,1),
-		new THREE.Vector3(-2,0,0)
-	];
+	var fragmentShader = fragmentShader || document.getElementById('fragmentshader').textContent;
 
+	var material = new THREE.ShaderMaterial({
+		uniforms: uniforms,
+		vertexShader: document.getElementById('extendedVertexshader').textContent,
+		fragmentShader: fragmentShader,
+		side: THREE.DoubleSide,
+		//wireframe: true
+	});
+
+	var lines = new THREE.Mesh(geometry, material);
+
+	return lines;
+}
+
+function makeExtendedLinesGeometry(linePoints) {
 	var positions = [];
 	var indices = [];
 	var nextPositions = [];
@@ -172,6 +177,8 @@ function makeExtendedGeometry() {
 	var flatPositions = flattenVectorArray(positions);
 	var flatNextPositions = flattenVectorArray(nextPositions);
 	var flatPreviousPositions = flattenVectorArray(previousPositions);
+
+	var geometry = new THREE.BufferGeometry();
 
 	geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 	geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(flatPositions), 3));
