@@ -24,18 +24,34 @@
 
 			uniform float time;
 			varying float hue;
-			attribute float miter; // TODO: Make normal an attribute instead
+			attribute float extensionDirection;
+			attribute vec3 nextPosition;
+			attribute vec3 previousPosition;
 
 			void main() {
 				hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
 				hue /= 15.0;
 
-    			float thickness = 0.05;
-    			vec3 normal = normalize(vec3(1.0, 1.0, 1.0));
-				vec3 extendedPosition = position.xyz + vec3(normal * thickness/2.0 * miter);
+    			vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
-				vec4 mvPosition = modelViewMatrix * vec4(extendedPosition, 1.0);
-    			gl_Position = projectionMatrix * mvPosition;
+    			float thickness = 0.05;
+
+				vec4 previousScreen4D = projectionMatrix * modelViewMatrix * vec4(previousPosition, 1.0);
+				vec2 previousScreen = previousScreen4D.xy / previousScreen4D.w;  // TODO: Do this?
+				vec4 nextScreen4D = projectionMatrix * modelViewMatrix * vec4(nextPosition, 1.0);
+				vec2 nextScreen = nextScreen4D.xy / nextScreen4D.w;  // TODO: Do this?
+				vec2 currentScreen = currentProjected.xy / currentProjected.w;  // TODO: Do this?
+
+				vec2 dirBackward = normalize(currentScreen - previousScreen);
+				vec2 dirForward = normalize(nextScreen - currentScreen);
+				vec2 dirTangent = normalize(dirForward + dirBackward);
+				vec2 miter = vec2(-dirTangent.y, dirTangent.x);
+				vec2 normal = vec2(-dirForward.y, dirForward.x);
+
+				float length = 1.0 / max(0.2, dot(miter, normal));
+
+				vec2 offset = miter * thickness/2.0 * extensionDirection * length;
+				gl_Position = currentProjected + vec4(offset, 0.0, 0.0);
 			}
 		</script>
 		<script type="x-shader/x-vertex" id="vertexshader">

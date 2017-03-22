@@ -39,7 +39,7 @@ function main() {
 	window.uniforms = uniforms;
 
 	var grid = new THREE.LineSegments(geometry, material);
-	grid.rotation.y = Math.PI / 4;
+	//grid.rotation.y = Math.PI / 4;
 	scene.add(grid);
 
 	//--
@@ -51,7 +51,8 @@ function main() {
 		uniforms: uniforms,
 		vertexShader: document.getElementById('extendedVertexshader').textContent,
 		fragmentShader: document.getElementById('fragmentshader').textContent,
-		side: THREE.DoubleSide
+		side: THREE.DoubleSide,
+		//wireframe: true
 	});
 
 	var lines = new THREE.Mesh(geometry, material);
@@ -61,6 +62,13 @@ function main() {
 
 	setupParameters();
 
+	renderer.domElement.addEventListener("mousedown", function(e) {
+		window.mouseDown = true;
+	});
+	renderer.domElement.addEventListener("mouseup", function(e) {
+		window.mouseDown = false;
+	});
+
 	animate();
 }
 
@@ -68,7 +76,7 @@ function makeGeometry() {
 	var geometry = new THREE.BufferGeometry();
 
 	var gridResolution = new THREE.Vector2(10, 10);
-	var gridDimensions = new THREE.Vector2(8, 8);
+	var gridDimensions = new THREE.Vector2(10, 10);
 
 	var positions = new Float32Array(gridResolution.x * gridResolution.y * 3);
 	
@@ -116,22 +124,25 @@ function makeExtendedGeometry() {
 		new THREE.Vector3(0,0,0),
 		new THREE.Vector3(0,1,0),
 		new THREE.Vector3(1,1,0),
-		new THREE.Vector3(-2,0,-2),
-		new THREE.Vector3(1,-1,1)
+		new THREE.Vector3(0,1,1),
+		new THREE.Vector3(-1,1,0),
+		new THREE.Vector3(-2,1,1),
+		new THREE.Vector3(-2,0,1),
+		new THREE.Vector3(-2,0,0)
 	];
 
 	var positions = [];
 	var indices = [];
-	var miters = [];
+	var nextPositions = [];
+	var previousPositions = [];
+	var extensionDirections = [];
 
 	var p00 = linePoints[0].clone();
 	var p01 = linePoints[0].clone();
-
-	//p00 = p00.clone().add(new THREE.Vector3(1,1,1).multiplyScalar(-0.02));
-	//p01 = p01.clone().add(new THREE.Vector3(1,1,1).multiplyScalar(0.02));
 	
 	positions.push(p00, p01);
-	miters.push(-1, 1);
+	extensionDirections.push(-1, 1);
+	previousPositions.push(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)); // TODO: Is this a problem when first linePoint is (0,0,0)?
 
 	for (var i in linePoints) {
 		if (i == 0) continue;
@@ -140,13 +151,6 @@ function makeExtendedGeometry() {
 		var p01 = linePoints[i-1].clone();
 		var p10 = linePoints[i].clone();
 		var p11 = linePoints[i].clone();
-
-		/*
-		p00 = p00.clone().add(new THREE.Vector3(1,1,1).multiplyScalar(-0.02));
-		p01 = p01.clone().add(new THREE.Vector3(1,1,1).multiplyScalar(0.02));
-		p10 = p10.clone().add(new THREE.Vector3(1,1,1).multiplyScalar(-0.02));
-		p11 = p11.clone().add(new THREE.Vector3(1,1,1).multiplyScalar(0.02));
-		*/
 
 		positions.push(p10, p11);
 
@@ -158,14 +162,22 @@ function makeExtendedGeometry() {
 		indices.push(i00, i10, i11);
 		indices.push(i00, i11, i01);
 
-		miters.push(-1, 1);
+        extensionDirections.push(-1, 1);
+		nextPositions.push(p10, p11);
+		previousPositions.push(p00, p01);
 	}
 
-	var flattenPositions = [].concat.apply([], positions.map(v => [v.x, v.y, v.z]));
+	nextPositions.push(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)); // TODO: Is this a problem when last linePoint is (0,0,0)?
+
+	var flatPositions = [].concat.apply([], positions.map(v => [v.x, v.y, v.z]));
+	var flatNextPositions = [].concat.apply([], nextPositions.map(v => [v.x, v.y, v.z]));
+	var flatPreviousPositions = [].concat.apply([], previousPositions.map(v => [v.x, v.y, v.z]));
 
 	geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
-	geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(flattenPositions), 3));
-	geometry.addAttribute('miter', new THREE.BufferAttribute(new Float32Array(miters), 1));
+	geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(flatPositions), 3));
+	geometry.addAttribute('extensionDirection', new THREE.BufferAttribute(new Float32Array(extensionDirections), 1));
+	geometry.addAttribute('nextPosition', new THREE.BufferAttribute(new Float32Array(flatNextPositions), 3));
+	geometry.addAttribute('previousPosition', new THREE.BufferAttribute(new Float32Array(flatPreviousPositions), 3));
 
 	geometry.computeBoundingSphere();
 
@@ -175,10 +187,12 @@ function makeExtendedGeometry() {
 function animate() {
 	requestAnimationFrame(animate);
 
-	var relativeTime = (new Date().getTime() - timeStart) / 1000;
-	window.uniforms.time.value = relativeTime;
+	// relativeTime /= 10;
+	if (!window.mouseDown) window.uniforms.time.value = (new Date().getTime() - timeStart) / 1000;
 
-	camera.position.set(5*Math.sin(relativeTime), 2, 5*Math.cos(relativeTime))
+	var time = window.uniforms.time.value;
+
+	camera.position.set(5*Math.sin(time), 2, 5*Math.cos(time))
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 	render();
