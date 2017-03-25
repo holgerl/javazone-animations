@@ -55,7 +55,7 @@ function main() {
 	lines.position.setY(-1);
 
 	var logo = makeJavaZoneLogo();
-	logo.rotation.x = 0.2;
+	logo.rotation.x = 0.3;
 	logo.position.setY(2);
 	scene.add(logo);
 	window.logo = logo;
@@ -155,7 +155,8 @@ function makePolygon(polygonPoints, material) {
 	var geometry = new THREE.Geometry();
 
 	for (var i in polygonPoints) {
-		var point = polygonPoints[i];
+		var point = polygonPoints[i].clone();
+		point.multiplyScalar(0.99); // TODO: Should be moved towards geometric center of all points
 		geometry.vertices.push(point);
 		if (i % 3 == 2) {
 			geometry.faces.push(new THREE.Face3(i-2, i-1, i));
