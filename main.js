@@ -42,7 +42,7 @@ function main() {
 
 	var grid = new THREE.LineSegments(geometry, material);
 	//grid.rotation.y = Math.PI / 4;
-	//scene.add(grid);
+	scene.add(grid);
 
 	var linePoints = [
 		new THREE.Vector3(0,0,0),
@@ -281,49 +281,62 @@ function flattenVectorArray(array) {
 function makeJavaZoneLogo() {
 	var logo = new THREE.Object3D();
 
-	var topLines1 = [
-		new THREE.Vector3(0, 1, 0),
-		new THREE.Vector3(1.25, 1.25, 0),
-		new THREE.Vector3(-0.75, 0, 1),
-	];
-	logo.add(makeExtendedLinesMesh(topLines1, true));
+	var A = new THREE.Vector3(0, 1, 0);
+	var B = new THREE.Vector3(1.25, 1.25, 0);
+	var C = new THREE.Vector3(-0.75, 0, 1);
+	var D = new THREE.Vector3(1.25, 0, -0.5);
+	var E = new THREE.Vector3(0, 0, -0.75);
 
+	var R = new THREE.Vector3(-1, 1.25, -1);
+	var S = new THREE.Vector3(0.5, 0.65, -0.75);
+	var T = new THREE.Vector3(1, 0, 1);
+	var U = new THREE.Vector3(0.5, 0, 1);
+	var V = new THREE.Vector3(0, 0, 0.5);
+	var W = new THREE.Vector3(0.5, 0, 0);
+
+	var topLines1 = [A, B, C];
+	logo.add(makeExtendedLinesMesh(topLines1, true));
 	logo.add(makePolygon(topLines1));
 
-	var sideLines1 = [
-		new THREE.Vector3(1.25, 1.25, 0),
-		new THREE.Vector3(1.25, 0, -0.5),
-		new THREE.Vector3(-0.75, 0, 1)
-	];
+	var sideLines1 = [B, D, C];
 	logo.add(makeExtendedLinesMesh(sideLines1, true));
 
-	var topLines2 = [
-		new THREE.Vector3(-1, 1.25, -1),
-		new THREE.Vector3(0.5, 0.75, 0),
-		new THREE.Vector3(1, 0, 1)
-	];
-	logo.add(makeExtendedLinesMesh(topLines2, true));
+	var backSideLines1 = [A, E, C];
+	logo.add(makeExtendedLinesMesh(backSideLines1, true));
 
+	var backBackSideLines1 = [E, D];
+	//logo.add(makeExtendedLinesMesh(backBackSideLines1, false));
+
+	var topLines2 = [R, S, T];
+	logo.add(makeExtendedLinesMesh(topLines2, true));
 	logo.add(makePolygon(topLines2));
 
-	var sideLines2 = [
-		new THREE.Vector3(-1, 1.25, -1),
-		new THREE.Vector3(1, 0, 1),
-		new THREE.Vector3(0.5, 0, 1),
-		new THREE.Vector3(0, 0, 0.5)
-	];
+	var sideLines2 = [R, T, U, V];
 	logo.add(makeExtendedLinesMesh(sideLines2, true));
 
-	var sidePlane2 = [
-		new THREE.Vector3(-1, 1.25, -1),
-		new THREE.Vector3(1, 0, 1),
-		new THREE.Vector3(0.5, 0, 1),
-		new THREE.Vector3(-1, 1.25, -1),
-		new THREE.Vector3(0.5, 0, 1),
-		new THREE.Vector3(0, 0, 0.5)
-	];
-	
+	var sidePlane2 = [R, T, U, R, U, V];
 	logo.add(makePolygon(sidePlane2));
+
+	var backSideLines2 = [S, V];
+	//logo.add(makeExtendedLinesMesh(backSideLines2, false));
+
+	var backBackSideLines2 = [S, U];
+	logo.add(makeExtendedLinesMesh(backBackSideLines2, false));
+
+	var sideBackPlane1 = [A, E, C];
+	logo.add(makePolygon(sideBackPlane1));
+
+	var sideBackBackPlane2 = [R, S, V];
+	//logo.add(makePolygon(sideBackBackPlane2));
+
+	var lowerBackSideLines2 = [R, E, T];
+	logo.add(makeExtendedLinesMesh(lowerBackSideLines2, false));
+
+	logo.add(makeExtendedLinesMesh([S, E], false));
+	logo.add(makePolygon([S, T, E]));
+	logo.add(makePolygon([S, R, E]));
+	logo.add(makePolygon([R, E, V]));
+
 
 	return logo;
 }
