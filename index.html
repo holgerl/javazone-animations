@@ -12,7 +12,12 @@
 				padding: 0px;
 			}
 			body {
-				overflow: hidden;
+			}
+			#renderer {
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -100;
 			}
 		</style>
 	</head>
@@ -101,5 +106,7 @@
 		<script type="text/javascript">
 			main();
 		</script>
+
+		<span style="position: absolute; top: 1rem; left: 1rem; font-family: 'Arial'; color: #eee; font-size: 300%">Klikk!<br/>Scroll ned</span>
 	</body>
 </html>

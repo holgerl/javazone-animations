@@ -26,6 +26,9 @@ function boilerPlate() {
 function main() {
 	boilerPlate();
 
+	window.logoSpinTime = 1;
+	window.wheelState = 0;
+
 	var uniforms = {
 		time: {value: 0.0}
 	};
@@ -33,7 +36,7 @@ function main() {
 
 	var grid = makeGrid();
 	grid.rotation.y = - Math.PI / 3 / 2;
-	grid.position.setY(-2);
+	grid.position.setY(-6);
 	scene.add(grid);
 
 	var linePoints = [
@@ -52,8 +55,10 @@ function main() {
 	lines.position.setY(-1);
 
 	var logo = makeJavaZoneLogo();
-	//logo.position.setY(1);
+	logo.rotation.x = 0.2;
+	logo.position.setY(2);
 	scene.add(logo);
+	window.logo = logo;
 
 	setupParameters();
 
@@ -136,7 +141,7 @@ function makeGrid() {
 	grid.add(gridLeft);
 	grid.add(gridRight);
 
-	grid.position.add(new THREE.Vector3(1, 0, 1));
+	grid.position.add(new THREE.Vector3(2, 0, 1));
 
 	return grid;
 }
@@ -270,15 +275,29 @@ function animate() {
 
 	if (!window.mouseState.mouseDown) {
 		window.uniforms.time.value = relativeTime;
-		camera.position.set(5*Math.sin(relativeTime*cameraSpeed), 2, 5*Math.cos(relativeTime*cameraSpeed))
+		camera.position.set(8*Math.sin(relativeTime*cameraSpeed), 2, 8*Math.cos(relativeTime*cameraSpeed))
 	} else {
 		var diff = window.mouseState.mousePosition.clone().sub(window.mouseState.mouseDownPosition);
 		diff.multiplyScalar(1/50);
 		var time = window.uniforms.time.value;
-		camera.position.set(5*Math.sin(time - diff.x), 2, 5*Math.cos(time - diff.y))
+		//camera.position.set(5*Math.sin(time - diff.x), 2, 5*Math.cos(time - diff.y))
 	}
 
-	camera.lookAt(new THREE.Vector3(0, 0, 0));
+	if (window.mouseState.mouseDown && window.logoSpinTime == 1) {
+		window.logoSpinTime = 0;
+	}
+
+	var spinSpeed = 1/40;
+
+	window.logoSpinTime = Math.min(1, window.logoSpinTime + spinSpeed);
+
+	var easedSpinTime = easeWaveCubic(logoSpinTime);
+	window.logo.rotation.y = easedSpinTime * Math.PI * 2;
+
+	var scrollSpeed = 0.010;
+	var cameraHeight = 2 - window.wheelState * scrollSpeed;
+	camera.position.setY(cameraHeight);
+	camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
 
 	render();
 }
@@ -311,7 +330,7 @@ function makeJavaZoneLogo() {
 	var B = new THREE.Vector3(1.25, 1.25, 0);
 	var C = new THREE.Vector3(-0.75, 0, 1);
 	var D = new THREE.Vector3(1.25, 0, -0.5);
-	var E = new THREE.Vector3(0, 0, -0.75);
+	var E = new THREE.Vector3(-0.25, 0, -1.25);
 
 	var R = new THREE.Vector3(-1, 1.25, -1);
 	var S = new THREE.Vector3(0.5, 0.65, -0.75);
@@ -384,4 +403,22 @@ function setupMouseEvents(domElement) {
 	domElement.addEventListener("mousemove", function(e) {
 		window.mouseState.mousePosition = new THREE.Vector2(e.clientX, e.clientX);
 	});
+
+	domElement.addEventListener("wheel", function(e) {
+		window.wheelState += e.deltaY;
+	});
+}
+
+function easeWaveQuartic(t) {
+	t /= 1/2;
+	if (t < 1) return 1/2*t*t*t*t;
+	t -= 2;
+	return -1/2 * (t*t*t*t - 2);
+}
+
+function easeWaveCubic(t) {
+	t /= 1/2;
+	if (t < 1) return 1/2*t*t*t;
+	t -= 2;
+	return 1/2*(t*t*t + 2);
 }
