@@ -407,6 +407,8 @@ function setupMouseEvents(domElement) {
 
 	domElement.addEventListener("wheel", function(e) {
 		window.wheelState += e.deltaY;
+		window.wheelState = Math.max(0, window.wheelState);
+		window.wheelState = Math.min(350, window.wheelState);
 	});
 }
 
