@@ -366,7 +366,7 @@ function setupParameters() {
 	};
 	window.parameters = new Parameters();
 	var gui = new dat.GUI();
-	gui.add({fireEvent: handleEvent},'fireEvent');
+	//gui.add({fireEvent: handleEvent},'fireEvent');
 }
 
 function flattenVectorArray(array) {
