@@ -35,7 +35,8 @@ function main() {
 	window.uniforms = uniforms;
 
 	var grid = makeGrid();
-	grid.rotation.y = - Math.PI / 3 / 2;
+	grid.rotation.y = - Math.PI / 3 / 1.5;
+	grid.rotation.x = -0.2;
 	grid.position.setY(-6);
 	scene.add(grid);
 
@@ -123,7 +124,7 @@ function makeGridGeometry(skewAmount) {
 	return geometry;
 }
 
-function makeGrid() {
+function makeGridOld() {
 	var skewAmount = -Math.cos(Math.PI / 3);
 
 	var geometry = makeGridGeometry(skewAmount);
@@ -150,10 +151,46 @@ function makeGrid() {
 	return grid;
 }
 
+function makeGrid() {
+	function makeSingleGrid() {
+		var grid = new THREE.Object3D();
+
+		var glowShader = document.getElementById('fragmentshaderGlow').textContent;
+
+		function addLine(line) {
+			grid.add(makeExtendedLinesMesh(line, false));
+			grid.add(makeExtendedLinesMesh(line, false, 0.3, glowShader));
+		}
+
+		for (var y = 0; y <= 5; y++) {
+			var line = [new THREE.Vector3(0, 0, y), new THREE.Vector3(5, 0, y)];
+			addLine(line);
+
+			var line = [new THREE.Vector3(y, 0, 0), new THREE.Vector3(y, 0, 5)];
+			addLine(line);
+		}
+
+		return grid;
+	}
+
+	var grid = new THREE.Object3D();
+	var singleGrid = makeSingleGrid();
+	singleGrid.position.add(new THREE.Vector3(-2, 0, 2));
+	grid.add(singleGrid);
+	var singleGrid = makeSingleGrid();
+	singleGrid.position.add(new THREE.Vector3(2, 0, -2));
+	grid.add(singleGrid);
+
+	return grid;
+} 
+
 function makePolygon(polygonPoints, material) {
 	var material = material || new THREE.MeshBasicMaterial({
 		color: 0x1D1D1D,
-		side: THREE.DoubleSide
+		side: THREE.DoubleSide,
+		//polygonOffset: true,
+        //polygonOffsetFactor: 2.0,
+        //polygonOffsetUnits: 22.0
 	});
 
 	var geometry = new THREE.Geometry();
@@ -193,9 +230,9 @@ function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShad
 		fragmentShader: fragmentShader,
 		side: THREE.DoubleSide,
 		transparent: true,
-		depthWrite: false
+		depthWrite: false,
 		//polygonOffset: true,
-        //polygonOffsetFactor: -2.0,
+        //polygonOffsetFactor: -3.0,
         //polygonOffsetUnits: -8.0
 		//wireframe: true
 	});
