@@ -47,13 +47,22 @@ function main() {
 		new THREE.Vector3(0,1,1),
 		new THREE.Vector3(-1,1,0),
 		new THREE.Vector3(-2,1,1),
-		new THREE.Vector3(-2,0,1),
-		new THREE.Vector3(-2,0,0)
+		new THREE.Vector3(-2.2,0,1),
+		new THREE.Vector3(-1.9,0,0)
 	];
+
+	var linePoints2 = [
+		new THREE.Vector3(-2.2,0,0),
+		new THREE.Vector3(-2.2,0,1)
+	]
 
 	var lines = makeExtendedLinesMesh(linePoints);
 	//scene.add(lines);
 	lines.position.setY(-1);
+
+	var lines2 = makeExtendedLinesMesh(linePoints2);
+	//scene.add(lines2);
+	lines2.position.setY(-1);
 
 	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.35, document.getElementById('fragmentshaderGlow').textContent);
 	//scene.add(linesGlow);
@@ -387,61 +396,59 @@ function makeJavaZoneLogo() {
 	var T = new THREE.Vector3(1, 0, 1);
 	var U = new THREE.Vector3(0.5, 0, 1);
 	var V = new THREE.Vector3(0, 0, 0.5);
-	var W = new THREE.Vector3(0.5, 0, 0);
+	var W = new THREE.Vector3(0.5, 0, -1);
 
 	var glowShader = document.getElementById('fragmentshaderGlow').textContent;
 
-	var topLines1 = [A, B, C];
-	logo.add(makeExtendedLinesMesh(topLines1, true));
-	logo.add(makeExtendedLinesMesh(topLines1, true, 0.3, glowShader));
-	logo.add(makePolygon(topLines1));
+	var glowWidth = 0.5;
 
-	var sideLines1 = [B, D, C];
-	logo.add(makeExtendedLinesMesh(sideLines1, true));
-	logo.add(makeExtendedLinesMesh(sideLines1, true, 0.3, glowShader));
+	var topLines1 = [A, B, D, C];
+	logo.add(makeExtendedLinesMesh(topLines1, true));
+	logo.add(makeExtendedLinesMesh(topLines1, true, glowWidth, glowShader));
+	logo.add(makePolygon([A, B, C]));
+
+	var sideLines1 = [B, C];
+	logo.add(makeExtendedLinesMesh(sideLines1, false));
+	logo.add(makeExtendedLinesMesh(sideLines1, false, glowWidth, glowShader));
 
 	var backSideLines1 = [A, E, C];
-	logo.add(makeExtendedLinesMesh(backSideLines1, true));
-	logo.add(makeExtendedLinesMesh(backSideLines1, true, 0.3, glowShader));
+	logo.add(makeExtendedLinesMesh(backSideLines1, false));
+	logo.add(makeExtendedLinesMesh(backSideLines1, false, glowWidth, glowShader));
 
 	var backBackSideLines1 = [E, D];
-	//logo.add(makeExtendedLinesMesh(backBackSideLines1, false));
 
-	var topLines2 = [R, S, T];
+	var topLines2 = [R, S, T, U, V];
 	logo.add(makeExtendedLinesMesh(topLines2, true));
-	logo.add(makeExtendedLinesMesh(topLines2, true, 0.3, glowShader));
+	logo.add(makeExtendedLinesMesh(topLines2, true, glowWidth, glowShader));
 	logo.add(makePolygon(topLines2));
 
-	var sideLines2 = [R, T, U, V];
-	logo.add(makeExtendedLinesMesh(sideLines2, true));
-	logo.add(makeExtendedLinesMesh(sideLines2, true, 0.3, glowShader));
+	var sideLines2 = [R, T];
+	logo.add(makeExtendedLinesMesh(sideLines2, false));
+	logo.add(makeExtendedLinesMesh(sideLines2, false, glowWidth, glowShader));
 
-	var sidePlane2 = [R, T, U, R, U, V];
-	logo.add(makePolygon(sidePlane2));
+    var sidePlane2 = [R, T, V];
+    logo.add(makePolygon(sidePlane2));
 
-	var backSideLines2 = [S, V];
-	//logo.add(makeExtendedLinesMesh(backSideLines2, false));
+    var sidePlane3 = [T, U, V];
+    logo.add(makePolygon(sidePlane3));
 
-	var backBackSideLines2 = [S, U];
+	var backSideLines2 = [S, W, V];
+	logo.add(makeExtendedLinesMesh(backSideLines2, false));
+	logo.add(makeExtendedLinesMesh(backSideLines2, false, glowWidth, glowShader));
+
+	var backBackSideLines2 = [R, W, T];
 	logo.add(makeExtendedLinesMesh(backBackSideLines2, false));
-	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, 0.3, glowShader));
+	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, glowWidth, glowShader));
 
 	var sideBackPlane1 = [A, E, C];
-	logo.add(makePolygon(sideBackPlane1));
-
-	var sideBackBackPlane2 = [R, S, V];
-	//logo.add(makePolygon(sideBackBackPlane2));
 
 	var lowerBackSideLines2 = [R, E, T];
-	logo.add(makeExtendedLinesMesh(lowerBackSideLines2, false));
-	logo.add(makeExtendedLinesMesh(lowerBackSideLines2, false, 0.3, glowShader));
 
-	logo.add(makeExtendedLinesMesh([S, E], false));
-	logo.add(makeExtendedLinesMesh([S, E], false, 0.3, glowShader));
-	logo.add(makePolygon([S, T, E]));
-	logo.add(makePolygon([S, R, E]));
-	logo.add(makePolygon([R, E, V]));
+	logo.add(makePolygon([A, E, C]));
+	logo.add(makePolygon([S, R, W]));
+	logo.add(makePolygon([S, T, W]));
 
+	logo.add(makePolygon([R, W, V]));
 
 	return logo;
 }
