@@ -53,7 +53,7 @@ function main() {
 
 	var linePoints2 = [
 		new THREE.Vector3(-2.2,0,0),
-		new THREE.Vector3(-2.2,0,1)
+		new THREE.Vector3(-2.21,0,0.9)
 	]
 
 	var lines = makeExtendedLinesMesh(linePoints);
@@ -64,9 +64,13 @@ function main() {
 	//scene.add(lines2);
 	lines2.position.setY(-1);
 
-	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.35, document.getElementById('fragmentshaderGlow').textContent);
+	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
 	//scene.add(linesGlow);
 	linesGlow.position.setY(-1);
+
+	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
+	//scene.add(linesGlow2);
+	linesGlow2.position.setY(-1);
 
 	var logo = makeJavaZoneLogo();
 	logo.rotation.x = 0.3;
@@ -407,9 +411,19 @@ function makeJavaZoneLogo() {
 	logo.add(makeExtendedLinesMesh(topLines1, true, glowWidth, glowShader));
 	logo.add(makePolygon([A, B, C]));
 
+	function shorten(segment, amount) {
+		var oldA = segment[0];
+		var oldB = segment[1];
+		var AB = oldB.clone().sub(oldA).multiplyScalar(amount);
+		var BA = oldA.clone().sub(oldB).multiplyScalar(amount);
+		var newA = oldB.clone().add(BA);
+		var newB = oldA.clone().add(AB);
+		return [newA, newB];
+	}
+
 	var sideLines1 = [B, C];
 	logo.add(makeExtendedLinesMesh(sideLines1, false));
-	logo.add(makeExtendedLinesMesh(sideLines1, false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(shorten(sideLines1, 0.98), false, glowWidth, glowShader));
 
 	var backSideLines1 = [A, E, C];
 	logo.add(makeExtendedLinesMesh(backSideLines1, false));
@@ -424,7 +438,7 @@ function makeJavaZoneLogo() {
 
 	var sideLines2 = [R, T];
 	logo.add(makeExtendedLinesMesh(sideLines2, false));
-	logo.add(makeExtendedLinesMesh(sideLines2, false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(shorten(sideLines2, 0.98), false, glowWidth, glowShader));
 
     var sidePlane2 = [R, T, V];
     logo.add(makePolygon(sidePlane2));
