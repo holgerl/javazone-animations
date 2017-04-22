@@ -332,19 +332,7 @@ function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 function animate() {
 	requestAnimationFrame(animate);
 
-	var relativeTime = (new Date().getTime() - timeStart) / 1000;
-
-	var cameraSpeed = 0;//1/10;
-
-	if (!window.mouseState.mouseDown) {
-		window.uniforms.time.value = relativeTime;
-		camera.position.set(8*Math.sin(relativeTime*cameraSpeed), 2, 8*Math.cos(relativeTime*cameraSpeed))
-	} else {
-		var diff = window.mouseState.mousePosition.clone().sub(window.mouseState.mouseDownPosition);
-		diff.multiplyScalar(1/50);
-		var time = window.uniforms.time.value;
-		//camera.position.set(5*Math.sin(time - diff.x), 2, 5*Math.cos(time - diff.y))
-	}
+	camera.position.set(8*Math.sin(0), 2, 8*Math.cos(0))
 
 	if (window.mouseState.mouseDown && window.logoSpinTime == 1) {
 		window.logoSpinTime = 0;
@@ -365,25 +353,15 @@ function animate() {
 	render();
 }
 
-function handleEvent() {
-
-}
-
 function render() {
 	window.renderer.render(window.scene, window.camera);
 }
 
 function setupParameters() {
 	var Parameters = function() {
-
 	};
 	window.parameters = new Parameters();
 	var gui = new dat.GUI();
-	//gui.add({fireEvent: handleEvent},'fireEvent');
-}
-
-function flattenVectorArray(array) {
-	return [].concat.apply([], array.map(v => [v.x, v.y, v.z]));
 }
 
 function makeJavaZoneLogo() {
@@ -490,18 +468,4 @@ function setupMouseEvents(domElement) {
 		window.wheelState = Math.max(0, window.wheelState);
 		window.wheelState = Math.min(350, window.wheelState);
 	});
-}
-
-function easeWaveQuartic(t) {
-	t /= 1/2;
-	if (t < 1) return 1/2*t*t*t*t;
-	t -= 2;
-	return -1/2 * (t*t*t*t - 2);
-}
-
-function easeWaveCubic(t) {
-	t /= 1/2;
-	if (t < 1) return 1/2*t*t*t;
-	t -= 2;
-	return 1/2*(t*t*t + 2);
 }
