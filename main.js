@@ -118,12 +118,14 @@ function makeGrid() {
 	}
 
 	var grid = new THREE.Object3D();
-	var singleGrid = makeSingleGrid();
-	singleGrid.position.add(new THREE.Vector3(-2, 0, 2));
-	grid.add(singleGrid);
-	var singleGrid = makeSingleGrid();
-	singleGrid.position.add(new THREE.Vector3(2, 0, -2));
-	grid.add(singleGrid);
+
+	var singleGrid1 = makeSingleGrid();
+	singleGrid1.position.add(new THREE.Vector3(-2, 0, 2));
+	grid.add(singleGrid1);
+	
+	var singleGrid2 = makeSingleGrid();
+	singleGrid2.position.add(new THREE.Vector3(2, 0, -2));
+	grid.add(singleGrid2);
 
 	return grid;
 } 
