@@ -94,85 +94,6 @@ function addDebugObjects() {
 	linesGlow2.position.setY(-1);
 }
 
-function makeGridGeometry(skewAmount) {
-	var geometry = new THREE.BufferGeometry();
-
-	var gridResolution = new THREE.Vector2(6, 6);
-	var gridDimensions = new THREE.Vector2(6, 6);
-
-	var positions = new Float32Array(gridResolution.x * gridResolution.y * 3);
-
-	var indices_array = [];
-
-	for (var y = 0; y < gridResolution.y; y++) {
-		for (var x = 0; x < gridResolution.x; x++) {
-
-			var positionX = -gridDimensions.x/2 + (x+0.5)/gridResolution.x * gridDimensions.x;
-			var positionY = 0;
-			var positionZ = -gridDimensions.y/2 + (y+0.5)/gridResolution.y * gridDimensions.y;
-
-			//var diagonal = Math.sqrt(x*x + y*y);
-			var skew = y * skewAmount;
-			positionX += skew;
-
-			var i = y * gridResolution.x + x;
-			var i10 = (y-1) * gridResolution.x + x;
-			var i01 = y * gridResolution.x + (x-1);
-			var i11 = (y-1) * gridResolution.x + (x-1);
-
-			if (x > 0 && y > 0) {
-				indices_array.push(i, i10);
-				indices_array.push(i, i01);
-				indices_array.push(i, i11);
-			} else if (x == 0 && y == 0) {
-				// Do nothing
-			} else if (x == 0) {
-				indices_array.push(i, i10);
-			} else if (y == 0) {
-				indices_array.push(i, i01);
-			}
-
-			positions[i*3 + 0] = positionX;
-			positions[i*3 + 1] = positionY;
-			positions[i*3 + 2] = positionZ;
-		}
-	}
-
-	geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices_array), 1));
-	geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-	geometry.computeBoundingSphere();
-
-	return geometry;
-}
-
-function makeGridOld() {
-	var skewAmount = -Math.cos(Math.PI / 3);
-
-	var geometry = makeGridGeometry(skewAmount);
-
-	var material = new THREE.ShaderMaterial({
-		uniforms: uniforms,
-		vertexShader: document.getElementById('vertexshader').textContent,
-		fragmentShader: document.getElementById('fragmentshader').textContent,
-		side: THREE.DoubleSide
-	});
-
-	var gridLeft = new THREE.LineSegments(geometry, material);
-	gridLeft.position.add(new THREE.Vector3(-3+skewAmount, 0, 3));
-
-	var gridRight = new THREE.LineSegments(geometry, material);
-	gridRight.position.add(new THREE.Vector3(3, 0, 0));
-
-	var grid = new THREE.Object3D();
-	grid.add(gridLeft);
-	grid.add(gridRight);
-
-	grid.position.add(new THREE.Vector3(2, 0, 1));
-
-	return grid;
-}
-
 function makeGrid() {
 	function makeSingleGrid() {
 		var grid = new THREE.Object3D();
@@ -250,9 +171,6 @@ function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShad
 		side: THREE.DoubleSide,
 		transparent: true,
 		depthWrite: false,
-		//polygonOffset: true,
-        //polygonOffsetFactor: -3.0,
-        //polygonOffsetUnits: -8.0
 		//wireframe: true
 	});
 
