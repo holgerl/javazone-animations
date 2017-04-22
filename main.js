@@ -74,19 +74,22 @@ function addDebugObjects() {
 		new THREE.Vector3(-2.21,0,0.9)
 	]
 
-	var lines = makeExtendedLinesMesh(linePoints);
+	var lineShader = document.getElementById('fragmentshader').textContent
+	var glowShader = document.getElementById('fragmentshaderGlow').textContent
+
+	var lines = makeExtendedLinesMesh(linePoints, false, 0.05, lineShader);
 	globals.scene.add(lines);
 	lines.position.setY(-1);
 
-	var lines2 = makeExtendedLinesMesh(linePoints2);
+	var lines2 = makeExtendedLinesMesh(linePoints2, false, 0.05, lineShader);
 	globals.scene.add(lines2);
 	lines2.position.setY(-1);
 
-	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
+	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, glowShader);
 	globals.scene.add(linesGlow);
 	linesGlow.position.setY(-1);
 
-	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
+	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, glowShader);
 	globals.scene.add(linesGlow2);
 	linesGlow2.position.setY(-1);
 }
@@ -175,10 +178,11 @@ function makeGrid() {
 		var grid = new THREE.Object3D();
 
 		var glowShader = document.getElementById('fragmentshaderGlow').textContent;
+		var lineShader = document.getElementById('fragmentshader').textContent;
 
 		function addLine(line) {
-			grid.add(makeExtendedLinesMesh(line, false));
-			grid.add(makeExtendedLinesMesh(line, false, 0.3, glowShader));
+			grid.add(makeExtendedLinesMesh(line, false, 0.05, lineShader));
+			grid.add(makeExtendedLinesMesh(line, false, 0.5, glowShader));
 		}
 
 		for (var y = 0; y <= 5; y++) {
@@ -232,10 +236,6 @@ function makePolygon(polygonPoints, material) {
 }
 
 function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShader) {
-	var fragmentShader = fragmentShader || document.getElementById('fragmentshader').textContent;
-	var isClosedLoop = isClosedLoop || false;
-	var lineWidth = lineWidth || 0.05;
-
 	var geometry = makeExtendedLinesGeometry(linePoints, isClosedLoop);
 
 	var localUniforms = {
@@ -387,11 +387,13 @@ function makeJavaZoneLogo() {
 	var W = new THREE.Vector3(0.5, 0, -1);
 
 	var glowShader = document.getElementById('fragmentshaderGlow').textContent;
+	var lineShader = document.getElementById('fragmentshader').textContent;
 
+	var lineWidth = 0.05;
 	var glowWidth = 0.5;
 
 	var topLines1 = [A, B, D, C];
-	logo.add(makeExtendedLinesMesh(topLines1, true));
+	logo.add(makeExtendedLinesMesh(topLines1, true, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(topLines1, true, glowWidth, glowShader));
 	logo.add(makePolygon([A, B, C]));
 
@@ -406,22 +408,22 @@ function makeJavaZoneLogo() {
 	}
 
 	var sideLines1 = [B, C];
-	logo.add(makeExtendedLinesMesh(sideLines1, false));
+	logo.add(makeExtendedLinesMesh(sideLines1, false, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(shorten(sideLines1, 0.98), false, glowWidth, glowShader));
 
 	var backSideLines1 = [A, E, C];
-	logo.add(makeExtendedLinesMesh(backSideLines1, false));
+	logo.add(makeExtendedLinesMesh(backSideLines1, false, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(backSideLines1, false, glowWidth, glowShader));
 
 	var backBackSideLines1 = [E, D];
 
 	var topLines2 = [R, S, T, U, V];
-	logo.add(makeExtendedLinesMesh(topLines2, true));
+	logo.add(makeExtendedLinesMesh(topLines2, true, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(topLines2, true, glowWidth, glowShader));
 	logo.add(makePolygon(topLines2));
 
 	var sideLines2 = [R, T];
-	logo.add(makeExtendedLinesMesh(sideLines2, false));
+	logo.add(makeExtendedLinesMesh(sideLines2, false, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(shorten(sideLines2, 0.98), false, glowWidth, glowShader));
 
     var sidePlane2 = [R, T, V];
@@ -431,16 +433,12 @@ function makeJavaZoneLogo() {
     logo.add(makePolygon(sidePlane3));
 
 	var backSideLines2 = [S, W, V];
-	logo.add(makeExtendedLinesMesh(backSideLines2, false));
+	logo.add(makeExtendedLinesMesh(backSideLines2, false, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(backSideLines2, false, glowWidth, glowShader));
 
 	var backBackSideLines2 = [R, W, T];
-	logo.add(makeExtendedLinesMesh(backBackSideLines2, false));
+	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, glowWidth, glowShader));
-
-	var sideBackPlane1 = [A, E, C];
-
-	var lowerBackSideLines2 = [R, E, T];
 
 	logo.add(makePolygon([A, E, C]));
 	logo.add(makePolygon([S, R, W]));
