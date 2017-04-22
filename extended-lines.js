@@ -1,16 +1,15 @@
 function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShader) {
 	var geometry = makeExtendedLinesGeometry(linePoints, isClosedLoop);
 
-	globals.shaderUtil = document.getElementById('shaderUtil').textContent;
+	var shaderUtil = document.getElementById('shaderUtil').textContent;
 
 	var localUniforms = {
-		lineWidth: {value: lineWidth},
-		time: globals.uniforms.time
+		lineWidth: {value: lineWidth}
 	}
 
 	var material = new THREE.ShaderMaterial({
 		uniforms: localUniforms,
-		vertexShader: globals.shaderUtil + document.getElementById('extendedVertexshader').textContent,
+		vertexShader: shaderUtil + document.getElementById('extendedVertexshader').textContent,
 		fragmentShader: fragmentShader,
 		side: THREE.DoubleSide,
 		transparent: true,
