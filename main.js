@@ -40,6 +40,22 @@ function main() {
 	grid.position.setY(-6);
 	scene.add(grid);
 
+	addDebugObjects();
+
+	var logo = makeJavaZoneLogo();
+	logo.rotation.x = 0.3;
+	logo.position.setY(2);
+	scene.add(logo);
+	window.logo = logo;
+
+	setupParameters();
+
+	setupMouseEvents(renderer.domElement);
+
+	animate();
+}
+
+function addDebugObjects() {
 	var linePoints = [
 		new THREE.Vector3(0,0,0),
 		new THREE.Vector3(0,1,0),
@@ -57,32 +73,20 @@ function main() {
 	]
 
 	var lines = makeExtendedLinesMesh(linePoints);
-	//scene.add(lines);
+	scene.add(lines);
 	lines.position.setY(-1);
 
 	var lines2 = makeExtendedLinesMesh(linePoints2);
-	//scene.add(lines2);
+	scene.add(lines2);
 	lines2.position.setY(-1);
 
 	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
-	//scene.add(linesGlow);
+	scene.add(linesGlow);
 	linesGlow.position.setY(-1);
 
 	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
-	//scene.add(linesGlow2);
+	scene.add(linesGlow2);
 	linesGlow2.position.setY(-1);
-
-	var logo = makeJavaZoneLogo();
-	logo.rotation.x = 0.3;
-	logo.position.setY(2);
-	scene.add(logo);
-	window.logo = logo;
-
-	setupParameters();
-
-	setupMouseEvents(renderer.domElement);
-
-	animate();
 }
 
 function makeGridGeometry(skewAmount) {
