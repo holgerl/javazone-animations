@@ -2,6 +2,8 @@
 
 var timeStart = new Date().getTime();
 
+var globals = {};
+
 function boilerPlate() {
 	var renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setClearColor(0x1D1D1D);
@@ -18,39 +20,39 @@ function boilerPlate() {
 
 	var scene = new THREE.Scene();
 	
-	window.renderer = renderer;
-	window.scene = scene;
-	window.camera = camera;
+	globals.renderer = renderer;
+	globals.scene = scene;
+	globals.camera = camera;
 }
 
 function main() {
 	boilerPlate();
 
-	window.logoSpinTime = 1;
-	window.wheelState = 0;
+	globals.logoSpinTime = 1;
+	globals.wheelState = 0;
 
 	var uniforms = {
 		time: {value: 0.0}
 	};
-	window.uniforms = uniforms;
+	globals.uniforms = uniforms;
 
 	var grid = makeGrid();
 	grid.rotation.y = - Math.PI / 3 / 1.5;
 	grid.rotation.x = -0.2;
 	grid.position.setY(-6);
-	scene.add(grid);
+	globals.scene.add(grid);
 
 	addDebugObjects();
 
 	var logo = makeJavaZoneLogo();
 	logo.rotation.x = 0.3;
 	logo.position.setY(2);
-	scene.add(logo);
-	window.logo = logo;
+	globals.scene.add(logo);
+	globals.logo = logo;
 
 	setupParameters();
 
-	setupMouseEvents(renderer.domElement);
+	setupMouseEvents(globals.renderer.domElement);
 
 	animate();
 }
@@ -73,19 +75,19 @@ function addDebugObjects() {
 	]
 
 	var lines = makeExtendedLinesMesh(linePoints);
-	scene.add(lines);
+	globals.scene.add(lines);
 	lines.position.setY(-1);
 
 	var lines2 = makeExtendedLinesMesh(linePoints2);
-	scene.add(lines2);
+	globals.scene.add(lines2);
 	lines2.position.setY(-1);
 
 	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
-	scene.add(linesGlow);
+	globals.scene.add(linesGlow);
 	linesGlow.position.setY(-1);
 
 	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, document.getElementById('fragmentshaderGlow').textContent);
-	scene.add(linesGlow2);
+	globals.scene.add(linesGlow2);
 	linesGlow2.position.setY(-1);
 }
 
@@ -238,7 +240,7 @@ function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShad
 
 	var localUniforms = {
 		lineWidth: {value: lineWidth},
-		time: window.uniforms.time
+		time: globals.uniforms.time
 	}
 
 	var material = new THREE.ShaderMaterial({
@@ -336,35 +338,35 @@ function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 function animate() {
 	requestAnimationFrame(animate);
 
-	camera.position.set(8*Math.sin(0), 2, 8*Math.cos(0))
+	globals.camera.position.set(8*Math.sin(0), 2, 8*Math.cos(0))
 
-	if (window.mouseState.mouseDown && window.logoSpinTime == 1) {
-		window.logoSpinTime = 0;
+	if (globals.mouseState.mouseDown && globals.logoSpinTime == 1) {
+		globals.logoSpinTime = 0;
 	}
 
 	var spinSpeed = 1/40;
 
-	window.logoSpinTime = Math.min(1, window.logoSpinTime + spinSpeed);
+	globals.logoSpinTime = Math.min(1, globals.logoSpinTime + spinSpeed);
 
-	var easedSpinTime = easeWaveCubic(logoSpinTime);
-	window.logo.rotation.y = easedSpinTime * Math.PI * 2;
+	var easedSpinTime = easeWaveCubic(globals.logoSpinTime);
+	globals.logo.rotation.y = easedSpinTime * Math.PI * 2;
 
 	var scrollSpeed = 0.010;
-	var cameraHeight = 2 - window.wheelState * scrollSpeed;
-	camera.position.setY(cameraHeight);
-	camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
+	var cameraHeight = 2 - globals.wheelState * scrollSpeed;
+	globals.camera.position.setY(cameraHeight);
+	globals.camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
 
 	render();
 }
 
 function render() {
-	window.renderer.render(window.scene, window.camera);
+	globals.renderer.render(globals.scene, globals.camera);
 }
 
 function setupParameters() {
 	var Parameters = function() {
 	};
-	window.parameters = new Parameters();
+	globals.parameters = new Parameters();
 	var gui = new dat.GUI();
 }
 
@@ -450,26 +452,26 @@ function makeJavaZoneLogo() {
 }
 
 function setupMouseEvents(domElement) {
-	window.mouseState = {};
+	globals.mouseState = {};
 
 	domElement.addEventListener("mousedown", function(e) {
-		window.mouseState.mouseDown = true;
+		globals.mouseState.mouseDown = true;
 		var position = new THREE.Vector2(e.clientX, e.clientX);
-		window.mouseState.mouseDownPosition = position;
-		window.mouseState.mousePosition = position;
+		globals.mouseState.mouseDownPosition = position;
+		globals.mouseState.mousePosition = position;
 	});
 
 	domElement.addEventListener("mouseup", function(e) {
-		window.mouseState.mouseDown = false;
+		globals.mouseState.mouseDown = false;
 	});
 
 	domElement.addEventListener("mousemove", function(e) {
-		window.mouseState.mousePosition = new THREE.Vector2(e.clientX, e.clientX);
+		globals.mouseState.mousePosition = new THREE.Vector2(e.clientX, e.clientX);
 	});
 
 	domElement.addEventListener("wheel", function(e) {
-		window.wheelState += e.deltaY;
-		window.wheelState = Math.max(0, window.wheelState);
-		window.wheelState = Math.min(350, window.wheelState);
+		globals.wheelState += e.deltaY;
+		globals.wheelState = Math.max(0, globals.wheelState);
+		globals.wheelState = Math.min(350, globals.wheelState);
 	});
 }
