@@ -32,7 +32,7 @@
 			vec2 perpendicular(vec2 v) {
 				return vec2(-v.y, v.x);
 			}
-			
+
 			vec3 hsv2rgb(vec3 c) {
 				vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
 				vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
@@ -83,20 +83,6 @@
 
 				vec2 offset = miter * thickness/2.0 * extensionDirection * miterLength;
 				gl_Position = currentProjected + vec4(offset, 0.0, 0.0);
-			}
-		</script>
-		
-		<script type="x-shader/x-vertex" id="vertexshader">
-			uniform float time;
-			varying float hue;
-
-			void main() {
-				hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
-				hue /= 15.0;
-
-				vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-
-    			gl_Position = projectionMatrix * mvPosition;
 			}
 		</script>
 		
