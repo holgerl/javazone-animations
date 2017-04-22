@@ -36,6 +36,8 @@ function main() {
 	};
 	globals.uniforms = uniforms;
 
+	globals.shaderUtil = document.getElementById('shaderUtil').textContent;
+
 	var grid = makeGrid();
 	grid.rotation.y = - Math.PI / 3 / 1.5;
 	grid.rotation.x = -0.2;
@@ -74,8 +76,8 @@ function addDebugObjects() {
 		new THREE.Vector3(-2.21,0,0.9)
 	]
 
-	var lineShader = document.getElementById('fragmentshader').textContent
-	var glowShader = document.getElementById('fragmentshaderGlow').textContent
+	var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent
+	var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent
 
 	var lines = makeExtendedLinesMesh(linePoints, false, 0.05, lineShader);
 	globals.scene.add(lines);
@@ -98,8 +100,8 @@ function makeGrid() {
 	function makeSingleGrid() {
 		var grid = new THREE.Object3D();
 
-		var glowShader = document.getElementById('fragmentshaderGlow').textContent;
-		var lineShader = document.getElementById('fragmentshader').textContent;
+		var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent;
+		var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent;
 
 		function addLine(line) {
 			grid.add(makeExtendedLinesMesh(line, false, 0.05, lineShader));
@@ -209,8 +211,8 @@ function makeJavaZoneLogo() {
 	var V = new THREE.Vector3(0, 0, 0.5);
 	var W = new THREE.Vector3(0.5, 0, -1);
 
-	var glowShader = document.getElementById('fragmentshaderGlow').textContent;
-	var lineShader = document.getElementById('fragmentshader').textContent;
+	var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent;
+	var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent;
 
 	var lineWidth = 0.05;
 	var glowWidth = 0.5;
