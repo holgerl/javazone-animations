@@ -9,6 +9,7 @@ varying float extension;
 void main() {
 	hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
 	hue /= 15.0;
+	hue += 0.45;
 
 	vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
