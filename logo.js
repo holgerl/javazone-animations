@@ -35,7 +35,7 @@ function main() {
 	};
 	globals.uniforms = uniforms;
 
-	globals.shaderUtil = document.getElementById('shaderUtil').textContent;
+	globals.shaderUtil = `${util.glsl}`;
 
 	addDebugObjects();
 
@@ -69,8 +69,8 @@ function addDebugObjects() {
 		new THREE.Vector3(-2.21,0,0.9)
 	]
 
-	var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent
-	var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent
+	var glowShader = globals.shaderUtil + `${fragshaderGlow.glsl}`;
+	var lineShader = globals.shaderUtil + `${fragshaderLine.glsl}`;
 
 	var lines = makeExtendedLinesMesh(linePoints, false, 0.05, lineShader);
 	globals.scene.add(lines);
@@ -161,8 +161,8 @@ function makeJavaZoneLogo() {
 	var V = new THREE.Vector3(0, 0, 0.5);
 	var W = new THREE.Vector3(0.5, 0, -1);
 
-	var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent;
-	var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent;
+	var glowShader = globals.shaderUtil + `${fragshaderGlow.glsl}`;
+	var lineShader = globals.shaderUtil + `${fragshaderLine.glsl}`;
 
 	var lineWidth = 0.05;
 	var glowWidth = 0.5;

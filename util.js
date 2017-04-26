@@ -16,6 +16,10 @@ function flattenVectorArray(array) {
 	return [].concat.apply([], array.map(v => [v.x, v.y, v.z]));
 }
 
+function clamp(number, from, to) {
+	return Math.max(Math.min(number, to), from);
+}
+
 function mapEventsToState(stateObject, domElement) {
 	stateObject.mouseState = {mouseDown: false, mouseDownPosition: undefined, mousePosition: undefined};
 	stateObject.wheelState = 0;

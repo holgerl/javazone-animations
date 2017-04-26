@@ -26,8 +26,7 @@ function boilerPlate() {
 function main() {
 	boilerPlate();
 
-	// TODO: Insert common glsl by build script
-	globals.shaderUtil = document.getElementById('shaderUtil').textContent;
+	globals.shaderUtil = `${util.glsl}`;
 
 	var grid = makeGrid();
 	grid.rotation.y = - Math.PI / 3 / 1.5;
@@ -46,9 +45,7 @@ function animate() {
 	globals.camera.position.set(8*Math.sin(0), 2, 8*Math.cos(0))
 
 	var scrollSpeed = 0.010;
-	var wheelState = globals.wheelState;
-	wheelState = Math.max(0, wheelState); // TODO: Replace with clamp
-	wheelState = Math.min(350, wheelState);
+	var wheelState = clamp(globals.wheelState, 0, 350);
 	var cameraHeight = 2 - wheelState * scrollSpeed;
 	globals.camera.position.setY(cameraHeight);
 	globals.camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
@@ -64,8 +61,8 @@ function makeGrid() {
 	function makeSingleGrid() {
 		var grid = new THREE.Object3D();
 
-		var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent;
-		var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent;
+		var glowShader = globals.shaderUtil + `${fragshaderGlow.glsl}`;
+		var lineShader = globals.shaderUtil + `${fragshaderLine.glsl}`;
 
 		function addLine(line) {
 			grid.add(makeExtendedLinesMesh(line, false, 0.05, lineShader));
