@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="./js-lib/three.js"></script>
+		<script src="./js-lib/dat.gui.js"></script>
+
+		<script src="./util.js"></script>
+		<script src="./extended-lines.js"></script>
+		<script src="./grid.js"></script>
+		
+		<style>
+			* {
+				margin: 0px;
+				padding: 0px;
+			}
+			body {
+			}
+			#renderer {
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -100;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="x-shader/x-util" id="shaderUtil">
+			float pointLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
+				return length(cross(lineEnd - lineStart, lineStart - point));
+			}
+
+			vec2 perpendicular(vec2 v) {
+				return vec2(-v.y, v.x);
+			}
+
+			vec3 hsv2rgb(vec3 c) {
+				vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+				vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+				return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+			}
+		</script>
+		
+		<script type="x-shader/x-vertex" id="extendedVertexshader">
+			uniform float lineWidth;
+			uniform float time;
+			varying float hue;
+			attribute float extensionDirection;
+			attribute vec3 nextPosition;
+			attribute vec3 previousPosition;
+			varying float extension;
+
+			void main() {
+				hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
+				hue /= 15.0;
+
+    			vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+    			float thickness = lineWidth;
+
+    			extension = extensionDirection;
+
+				vec4 previousScreen4D = projectionMatrix * modelViewMatrix * vec4(previousPosition, 1.0);
+				vec2 previousScreen = previousScreen4D.xy / previousScreen4D.w;
+				vec4 nextScreen4D = projectionMatrix * modelViewMatrix * vec4(nextPosition, 1.0);
+				vec2 nextScreen = nextScreen4D.xy / nextScreen4D.w;
+				vec2 currentScreen = currentProjected.xy / currentProjected.w;
+
+				vec2 dirBackward = normalize(currentScreen - previousScreen);
+				vec2 dirForward = normalize(nextScreen - currentScreen);
+				vec2 dirTangent = normalize(dirForward + dirBackward);
+				vec2 miter = perpendicular(dirTangent);
+				vec2 normal = perpendicular(dirForward);
+
+				float miterLength = 1.0 / max(0.2, dot(miter, normal));
+
+				if (currentScreen == previousScreen) { // At start of line segments
+					miter = perpendicular(dirForward);
+					miterLength = 1.0;
+				} else if (nextScreen == currentScreen) { // At end of line segments
+					miter = perpendicular(dirBackward);
+					miterLength = 1.0;
+				}
+
+				vec2 offset = miter * thickness/2.0 * extensionDirection * miterLength;
+				gl_Position = currentProjected + vec4(offset, 0.0, 0.0);
+			}
+		</script>
+		
+		<script type="x-shader/x-fragment" id="fragmentshader">
+			uniform float time;
+			varying float hue;
+
+			void main() {
+				vec3 color = hsv2rgb(vec3(hue, 0.75, 1.0));
+				gl_FragColor = vec4(color.xyz, 1.0);
+			}
+		</script>
+		
+		<script type="x-shader/x-fragment" id="fragmentshaderGlow">
+			uniform float time;
+			varying float hue;
+			varying float extension;
+
+			void main() {
+				vec3 color = hsv2rgb(vec3(hue, 0.75, 1.0));
+				float alpha = 1.0 - abs(extension);
+				alpha = clamp(alpha, 0.0, 1.0);
+				alpha = pow(alpha, 3.0);
+				alpha *= 0.5;
+				gl_FragColor = vec4(color.xyz, alpha);
+			}
+		</script>
+
+		<script type="text/javascript">
+			main();
+		</script>
+
+		<span style="position: absolute; top: 1rem; left: 1rem; font-family: 'Arial'; color: #eee; font-size: 300%">Work in progress!<br/>Scroll ned</span>
+	</body>
+</html>

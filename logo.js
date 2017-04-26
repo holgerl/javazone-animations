@@ -13,8 +13,8 @@ function boilerPlate() {
 	var ratio = renderer.getContext().drawingBufferWidth / renderer.getContext().drawingBufferHeight;
 	
 	var camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 10000);
-	camera.position.set(0, 2, 5)
-	camera.lookAt(new THREE.Vector3(0, 0, 0));
+	camera.position.set(0, 2, 8)
+	camera.lookAt(new THREE.Vector3(0, 2, 0));
 
 	document.body.appendChild(renderer.domElement);
 
@@ -29,7 +29,6 @@ function main() {
 	boilerPlate();
 
 	globals.logoSpinTime = 1;
-	globals.wheelState = 0;
 
 	var uniforms = {
 		time: {value: 0.0}
@@ -37,12 +36,6 @@ function main() {
 	globals.uniforms = uniforms;
 
 	globals.shaderUtil = document.getElementById('shaderUtil').textContent;
-
-	var grid = makeGrid();
-	grid.rotation.y = - Math.PI / 3 / 1.5;
-	grid.rotation.x = -0.2;
-	grid.position.setY(-6);
-	globals.scene.add(grid);
 
 	addDebugObjects();
 
@@ -54,7 +47,7 @@ function main() {
 
 	setupParameters();
 
-	setupMouseEvents(globals.renderer.domElement);
+	setupGuiEvents(globals.renderer.domElement);
 
 	animate();
 }
@@ -96,42 +89,6 @@ function addDebugObjects() {
 	linesGlow2.position.setY(-1);
 }
 
-function makeGrid() {
-	function makeSingleGrid() {
-		var grid = new THREE.Object3D();
-
-		var glowShader = globals.shaderUtil + document.getElementById('fragmentshaderGlow').textContent;
-		var lineShader = globals.shaderUtil + document.getElementById('fragmentshader').textContent;
-
-		function addLine(line) {
-			grid.add(makeExtendedLinesMesh(line, false, 0.05, lineShader));
-			grid.add(makeExtendedLinesMesh(line, false, 0.5, glowShader));
-		}
-
-		for (var y = 0; y <= 5; y++) {
-			var line = [new THREE.Vector3(0, 0, y), new THREE.Vector3(5, 0, y)];
-			addLine(line);
-
-			var line = [new THREE.Vector3(y, 0, 0), new THREE.Vector3(y, 0, 5)];
-			addLine(line);
-		}
-
-		return grid;
-	}
-
-	var grid = new THREE.Object3D();
-
-	var singleGrid1 = makeSingleGrid();
-	singleGrid1.position.add(new THREE.Vector3(-2, 0, 2));
-	grid.add(singleGrid1);
-	
-	var singleGrid2 = makeSingleGrid();
-	singleGrid2.position.add(new THREE.Vector3(2, 0, -2));
-	grid.add(singleGrid2);
-
-	return grid;
-} 
-
 function makePolygon(polygonPoints, material) {
 	var material = material || new THREE.MeshBasicMaterial({
 		color: 0x1D1D1D,
@@ -163,8 +120,6 @@ function makePolygon(polygonPoints, material) {
 function animate() {
 	requestAnimationFrame(animate);
 
-	globals.camera.position.set(8*Math.sin(0), 2, 8*Math.cos(0))
-
 	if (globals.mouseState.mouseDown && globals.logoSpinTime == 1) {
 		globals.logoSpinTime = 0;
 	}
@@ -175,11 +130,6 @@ function animate() {
 
 	var easedSpinTime = easeWaveCubic(globals.logoSpinTime);
 	globals.logo.rotation.y = easedSpinTime * Math.PI * 2;
-
-	var scrollSpeed = 0.010;
-	var cameraHeight = 2 - globals.wheelState * scrollSpeed;
-	globals.camera.position.setY(cameraHeight);
-	globals.camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
 
 	render();
 }
@@ -274,8 +224,9 @@ function makeJavaZoneLogo() {
 	return logo;
 }
 
-function setupMouseEvents(domElement) {
-	globals.mouseState = {};
+function setupGuiEvents(domElement) {
+	globals.mouseState = {mouseDown: false, mouseDownPosition: undefined};
+	globals.wheelState = 0;
 
 	domElement.addEventListener("mousedown", function(e) {
 		globals.mouseState.mouseDown = true;
