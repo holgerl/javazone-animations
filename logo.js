@@ -47,7 +47,7 @@ function main() {
 
 	setupParameters();
 
-	setupGuiEvents(globals.renderer.domElement);
+	mapEventsToState(globals, globals.renderer.domElement);
 
 	animate();
 }
@@ -222,30 +222,4 @@ function makeJavaZoneLogo() {
 	logo.add(makePolygon([R, W, V]));
 
 	return logo;
-}
-
-function setupGuiEvents(domElement) {
-	globals.mouseState = {mouseDown: false, mouseDownPosition: undefined};
-	globals.wheelState = 0;
-
-	domElement.addEventListener("mousedown", function(e) {
-		globals.mouseState.mouseDown = true;
-		var position = new THREE.Vector2(e.clientX, e.clientX);
-		globals.mouseState.mouseDownPosition = position;
-		globals.mouseState.mousePosition = position;
-	});
-
-	domElement.addEventListener("mouseup", function(e) {
-		globals.mouseState.mouseDown = false;
-	});
-
-	domElement.addEventListener("mousemove", function(e) {
-		globals.mouseState.mousePosition = new THREE.Vector2(e.clientX, e.clientX);
-	});
-
-	domElement.addEventListener("wheel", function(e) {
-		globals.wheelState += e.deltaY;
-		globals.wheelState = Math.max(0, globals.wheelState);
-		globals.wheelState = Math.min(350, globals.wheelState);
-	});
 }

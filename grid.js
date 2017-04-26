@@ -35,7 +35,7 @@ function main() {
 	grid.position.setY(-6);
 	globals.scene.add(grid);
 
-	setupGuiEvents(globals.renderer.domElement);
+	mapEventsToState(globals, globals.renderer.domElement);
 
 	animate();
 }
@@ -46,7 +46,10 @@ function animate() {
 	globals.camera.position.set(8*Math.sin(0), 2, 8*Math.cos(0))
 
 	var scrollSpeed = 0.010;
-	var cameraHeight = 2 - globals.wheelState * scrollSpeed;
+	var wheelState = globals.wheelState;
+	wheelState = Math.max(0, wheelState); // TODO: Replace with clamp
+	wheelState = Math.min(350, wheelState);
+	var cameraHeight = 2 - wheelState * scrollSpeed;
 	globals.camera.position.setY(cameraHeight);
 	globals.camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
 
@@ -92,29 +95,3 @@ function makeGrid() {
 
 	return grid;
 } 
-
-function setupGuiEvents(domElement) { // TODO: DRY with logo.js
-	globals.mouseState = {mouseDown: false, mouseDownPosition: undefined};
-	globals.wheelState = 0;
-
-	domElement.addEventListener("mousedown", function(e) {
-		globals.mouseState.mouseDown = true;
-		var position = new THREE.Vector2(e.clientX, e.clientX);
-		globals.mouseState.mouseDownPosition = position;
-		globals.mouseState.mousePosition = position;
-	});
-
-	domElement.addEventListener("mouseup", function(e) {
-		globals.mouseState.mouseDown = false;
-	});
-
-	domElement.addEventListener("mousemove", function(e) {
-		globals.mouseState.mousePosition = new THREE.Vector2(e.clientX, e.clientX);
-	});
-
-	domElement.addEventListener("wheel", function(e) {
-		globals.wheelState += e.deltaY;
-		globals.wheelState = Math.max(0, globals.wheelState);
-		globals.wheelState = Math.min(350, globals.wheelState);
-	});
-}
