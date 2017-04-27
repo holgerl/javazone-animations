@@ -2,9 +2,11 @@ uniform float lineWidth;
 uniform float time;
 varying float hue;
 attribute float extensionDirection;
+attribute float surfaceIndex;
 attribute vec3 nextPosition;
 attribute vec3 previousPosition;
 varying float extension;
+varying float surfaceIndexToFragShader;
 
 void main() {
 	hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
@@ -16,6 +18,7 @@ void main() {
 	float thickness = lineWidth;
 
 	extension = extensionDirection;
+	surfaceIndexToFragShader = surfaceIndex;
 
 	vec4 previousScreen4D = projectionMatrix * modelViewMatrix * vec4(previousPosition, 1.0);
 	vec2 previousScreen = previousScreen4D.xy / previousScreen4D.w;
