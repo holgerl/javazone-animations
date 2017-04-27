@@ -126,9 +126,14 @@ function animate() {
 
 	var spinSpeed = 1/40;
 
+	//spinSpeed /= 10;
+
 	globals.logoSpinTime = Math.min(1, globals.logoSpinTime + spinSpeed);
 
 	var easedSpinTime = easeWaveCubic(globals.logoSpinTime);
+	
+	//easedSpinTime = globals.logoSpinTime;
+
 	globals.logo.rotation.y = easedSpinTime * Math.PI * 2;
 
 	render();
@@ -151,14 +156,14 @@ function makeJavaZoneLogo() {
 	var A = new THREE.Vector3(0, 1, 0);
 	var B = new THREE.Vector3(1.25, 1.25, 0);
 	var C = new THREE.Vector3(-0.75, 0, 1);
-	var D = new THREE.Vector3(1.25, 0, -0.5);
+	var D = new THREE.Vector3(1.25, 0.1, -0.5);
 	var E = new THREE.Vector3(-0.25, 0, -1.25);
 
 	var R = new THREE.Vector3(-1, 1.25, -1);
 	var S = new THREE.Vector3(0.5, 0.65, -0.75);
-	var T = new THREE.Vector3(1, 0, 1);
-	var U = new THREE.Vector3(0.5, 0, 1);
-	var V = new THREE.Vector3(0, 0, 0.5);
+	var T = new THREE.Vector3(1.15, 0, 1);
+	var U = new THREE.Vector3(0.3, 0, 1.2);
+	var V = new THREE.Vector3(-0.2, 0.15, 0.9);
 	var W = new THREE.Vector3(0.5, 0, -1);
 
 	var glowShader = globals.shaderUtil + `${fragshaderGlow.glsl}`;
