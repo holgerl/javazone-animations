@@ -20,6 +20,19 @@ function clamp(number, from, to) {
 	return Math.max(Math.min(number, to), from);
 }
 
+function arrayRotateLeft(arr, reverse){
+	if (reverse)
+		arr.unshift(arr.pop());
+	else
+		arr.push(arr.shift());
+
+	return arr;
+}
+
+function arrayRotateRight(arr, reverse){
+	return arrayRotateLeft(arr, !reverse);
+}
+
 function mapEventsToState(stateObject, domElement) {
 	stateObject.mouseState = {mouseDown: false, mouseDownPosition: undefined, mousePosition: undefined};
 	stateObject.wheelState = 0;
