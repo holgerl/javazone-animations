@@ -215,7 +215,6 @@ function makeJavaZoneLogo() {
 	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, lineWidth, lineShader));
 	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, glowWidth, glowShader));
 
-	logo.add(makePolygon([A, E, C]));
 	logo.add(makePolygon([S, R, W]));
 	logo.add(makePolygon([S, T, W]));
 
