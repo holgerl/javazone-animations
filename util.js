@@ -37,11 +37,21 @@ function mapEventsToState(stateObject, domElement) {
 	stateObject.mouseState = {mouseDown: false, mouseDownPosition: undefined, mousePosition: undefined};
 	stateObject.wheelState = 0;
 
-	domElement.addEventListener("mousedown", function(e) {
+	function mouseTouchDown(position) {
 		stateObject.mouseState.mouseDown = true;
-		var position = new THREE.Vector2(e.clientX, e.clientX);
 		stateObject.mouseState.mouseDownPosition = position;
 		stateObject.mouseState.mousePosition = position;
+	}
+
+	domElement.addEventListener("mousedown", function(e) {
+		var position = new THREE.Vector2(e.clientX, e.clientX);
+		mouseTouchDown(position);
+	});
+
+	domElement.addEventListener("touchstart", function(e) {
+		var touch = e.touches[0];
+		var position = new THREE.Vector2(touch.clientX, touch.clientX);
+		mouseTouchDown(position);
 	});
 
 	domElement.addEventListener("mouseup", function(e) {
