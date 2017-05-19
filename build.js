@@ -98,9 +98,16 @@ function buildFile(filePath) {
 }
 
 function build() {
-	removeNonEmptyDirectory("built");
-	fs.mkdir("built");
-	buildDirectory("./");
+	try {
+		removeNonEmptyDirectory("built");
+		fs.mkdir("built");
+		buildDirectory("./");
+	} catch (e) {
+		console.error(e);
+	}
 }
 
-setInterval(build, 1500);
+build();
+setInterval(build, 5000);
+
+// TODO: Trigger build on directory watch
