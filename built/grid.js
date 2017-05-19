@@ -61,6 +61,7 @@ function animate() {
 	//var cameraHeight = 2 - wheelState * scrollSpeed; 
 	var scrollToBottom = (window.innerHeight + window.scrollY) - document.body.offsetHeight;
 	scrollToBottom = Math.max(scrollToBottom, -100)
+	scrollToBottom = Math.min(scrollToBottom, 0);
 	scrollToBottom += 100;
 	var cameraHeight = -scrollToBottom / 50.0 - 0.5;
 	globals.camera.position.setY(cameraHeight);
