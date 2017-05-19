@@ -7,6 +7,8 @@ attribute vec3 nextPosition;
 attribute vec3 previousPosition;
 varying float extension;
 varying float surfaceIndexToFragShader;
+attribute vec3 color;
+varying vec3 vertexColor;
 
 void main() {
 	hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
@@ -16,6 +18,8 @@ void main() {
 	vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
 	float thickness = lineWidth;
+
+	vertexColor = color;
 
 	extension = extensionDirection;
 	surfaceIndexToFragShader = surfaceIndex;

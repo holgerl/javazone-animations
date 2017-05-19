@@ -37,7 +37,7 @@ function main() {
 
 	globals.shaderUtil = `${util.glsl}`;
 
-	addDebugObjects();
+	//addDebugObjects();
 
 	var logo = makeJavaZoneLogo();
 	logo.rotation.x = 0.3;
@@ -69,22 +69,38 @@ function addDebugObjects() {
 		new THREE.Vector3(-2.21,0,0.9)
 	]
 
+	var jointColors = [
+		new THREE.Color(1,0,0),
+		new THREE.Color(0,1,0),
+		new THREE.Color(0,0,1),
+		new THREE.Color(1,1,0),
+		new THREE.Color(0,1,1),
+		new THREE.Color(1,0,1),
+		new THREE.Color(1,0.5,1),
+		new THREE.Color(0.5,1,1)
+	];
+
+	var jointColors2 = [
+		new THREE.Color(1,0.5,1),
+		new THREE.Color(0.5,0.5,1),
+	];
+
 	var glowShader = globals.shaderUtil + `${fragshaderGlow.glsl}`;
 	var lineShader = globals.shaderUtil + `${fragshaderLine.glsl}`;
 
-	var lines = makeExtendedLinesMesh(linePoints, false, 0.05, lineShader);
+	var lines = makeExtendedLinesMesh(linePoints, false, 0.05, lineShader, jointColors);
 	globals.scene.add(lines);
 	lines.position.setY(-1);
 
-	var lines2 = makeExtendedLinesMesh(linePoints2, false, 0.05, lineShader);
+	var lines2 = makeExtendedLinesMesh(linePoints2, false, 0.05, lineShader, jointColors2);
 	globals.scene.add(lines2);
 	lines2.position.setY(-1);
 
-	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, glowShader);
+	var linesGlow = makeExtendedLinesMesh(linePoints, false, 0.5, glowShader, jointColors);
 	globals.scene.add(linesGlow);
 	linesGlow.position.setY(-1);
 
-	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, glowShader);
+	var linesGlow2 = makeExtendedLinesMesh(linePoints2, false, 0.5, glowShader, jointColors2);
 	globals.scene.add(linesGlow2);
 	linesGlow2.position.setY(-1);
 }
@@ -166,6 +182,23 @@ function makeJavaZoneLogo() {
 	var V = new THREE.Vector3(-0.2, 0.15, 0.9);
 	var W = new THREE.Vector3(0.5, 0, -1);
 
+	var colorA = new THREE.Color(0.5,0,1);
+	var colorB = new THREE.Color(0,0,1);
+	var colorC = new THREE.Color(0,1,0);
+	var colorD = new THREE.Color(1,0.5,0.5);
+	var colorE = new THREE.Color(1,1,1);
+	var colorS = new THREE.Color(0,0.5,1);
+	var colorR = new THREE.Color(1,0,1);
+	var colorT = new THREE.Color(1,0.5,0);
+	var colorU = new THREE.Color(0.5,1,0);
+	var colorV = new THREE.Color(0.5,1,0.5);
+	var colorW = new THREE.Color(0.5, 0.5, 0.5);
+
+	for (var color of [colorA, colorB, colorC, colorD, colorE, colorS, colorR, colorT, colorU, colorV, colorW]) {
+		//color.multiplyScalar(2.5);
+		color.addScalar(0.3);
+	}
+
 	var glowShader = globals.shaderUtil + `${fragshaderGlow.glsl}`;
 	var lineShader = globals.shaderUtil + `${fragshaderLine.glsl}`;
 
@@ -173,8 +206,8 @@ function makeJavaZoneLogo() {
 	var glowWidth = 0.5;
 
 	var topLines1 = [A, B, D, C];
-	logo.add(makeExtendedLinesMesh(topLines1, true, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(topLines1, true, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(topLines1, true, lineWidth, lineShader, [colorA, colorB, colorD, colorC]));
+	logo.add(makeExtendedLinesMesh(topLines1, true, glowWidth, glowShader, [colorA, colorB, colorD, colorC]));
 	logo.add(makePolygon([A, B, C]));
 
 	function shorten(segment, amount) {
@@ -188,23 +221,23 @@ function makeJavaZoneLogo() {
 	}
 
 	var sideLines1 = [B, C];
-	logo.add(makeExtendedLinesMesh(sideLines1, false, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(shorten(sideLines1, 0.98), false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(sideLines1, false, lineWidth, lineShader, [colorB, colorC]));
+	logo.add(makeExtendedLinesMesh(shorten(sideLines1, 0.98), false, glowWidth, glowShader, [colorB, colorC]));
 
 	var backSideLines1 = [A, E, C];
-	logo.add(makeExtendedLinesMesh(backSideLines1, false, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(backSideLines1, false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(backSideLines1, false, lineWidth, lineShader, [colorA, colorE, colorC]));
+	logo.add(makeExtendedLinesMesh(backSideLines1, false, glowWidth, glowShader, [colorA, colorE, colorC]));
 
 	var backBackSideLines1 = [E, D];
 
 	var topLines2 = [R, S, T, U, V];
-	logo.add(makeExtendedLinesMesh(topLines2, true, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(topLines2, true, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(topLines2, true, lineWidth, lineShader, [colorR, colorS, colorT, colorU, colorV]));
+	logo.add(makeExtendedLinesMesh(topLines2, true, glowWidth, glowShader, [colorR, colorS, colorT, colorU, colorV]));
 	logo.add(makePolygon(topLines2));
 
 	var sideLines2 = [R, T];
-	logo.add(makeExtendedLinesMesh(sideLines2, false, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(shorten(sideLines2, 0.98), false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(sideLines2, false, lineWidth, lineShader, [colorR, colorT]));
+	logo.add(makeExtendedLinesMesh(shorten(sideLines2, 0.98), false, glowWidth, glowShader, [colorR, colorT]));
 
     var sidePlane2 = [R, T, V];
     logo.add(makePolygon(sidePlane2));
@@ -213,12 +246,12 @@ function makeJavaZoneLogo() {
     logo.add(makePolygon(sidePlane3));
 
 	var backSideLines2 = [S, W, V];
-	logo.add(makeExtendedLinesMesh(backSideLines2, false, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(backSideLines2, false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(backSideLines2, false, lineWidth, lineShader, [colorS, colorW, colorV]));
+	logo.add(makeExtendedLinesMesh(backSideLines2, false, glowWidth, glowShader, [colorS, colorW, colorV]));
 
 	var backBackSideLines2 = [R, W, T];
-	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, lineWidth, lineShader));
-	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, glowWidth, glowShader));
+	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, lineWidth, lineShader, [colorR, colorW, colorT]));
+	logo.add(makeExtendedLinesMesh(backBackSideLines2, false, glowWidth, glowShader, [colorR, colorW, colorT]));
 
 	logo.add(makePolygon([S, R, W]));
 	logo.add(makePolygon([S, T, W]));

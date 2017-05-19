@@ -13,7 +13,7 @@ function easeWaveCubic(t) {
 }
 
 function flattenVectorArray(array) {
-	return [].concat.apply([], array.map(v => [v.x, v.y, v.z]));
+	return [].concat.apply([], array.map(v => v.x !== undefined ? [v.x, v.y, v.z] : [v.r, v.g, v.b]));
 }
 
 function clamp(number, from, to) {

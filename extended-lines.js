@@ -1,5 +1,5 @@
-function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShader) {
-	var geometry = makeExtendedLinesGeometry(linePoints, isClosedLoop);
+function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShader, jointColors) {
+	var geometry = makeExtendedLinesGeometry(linePoints, isClosedLoop, jointColors);
 
 	var shaderUtil = `${util.glsl}`;
 
@@ -22,13 +22,14 @@ function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShad
 	return lines;
 }
 
-function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
+function makeExtendedLinesGeometry(linePoints, isClosedLoop, jointColors) {
 	var positions = [];
 	var indices = [];
 	var nextPositions = [];
 	var previousPositions = [];
 	var extensionDirections = [];
 	var surfaceIndecies = [];
+	var jointIndecies = [];
 	var linepointIndecies = [];
 
 	previousPositions = arrayRotateRight(linePoints.slice());
@@ -54,6 +55,8 @@ function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 
 		var surfaceIndex = fromIndex;
 		surfaceIndecies.push(surfaceIndex, surfaceIndex, surfaceIndex, surfaceIndex);
+
+		jointIndecies.push(fromIndex, fromIndex, toIndex, toIndex);
 
 		var length = positions.length;
 
@@ -100,9 +103,17 @@ function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 		previousPositionsExploded.push(linePoints[previousIndex]);
 	}
 
+	var vertexColors = [];
+
+	for (var i in jointIndecies) {
+		var jointIndex = jointIndecies[i];
+		jointColors ? vertexColors.push(jointColors[jointIndex]) : vertexColors.push(new THREE.Color(0,0,0));
+	}
+
 	var flatPositions = flattenVectorArray(positions);
 	var flatNextPositions = flattenVectorArray(nextPositionsExploded);
 	var flatPreviousPositions = flattenVectorArray(previousPositionsExploded);
+	var flatColors = flattenVectorArray(vertexColors);
 
 	var geometry = new THREE.BufferGeometry();
 
@@ -112,6 +123,7 @@ function makeExtendedLinesGeometry(linePoints, isClosedLoop) {
 	geometry.addAttribute('nextPosition', new THREE.BufferAttribute(new Float32Array(flatNextPositions), 3));
 	geometry.addAttribute('previousPosition', new THREE.BufferAttribute(new Float32Array(flatPreviousPositions), 3));
 	geometry.addAttribute('surfaceIndex', new THREE.BufferAttribute(new Float32Array(surfaceIndecies), 1));
+	geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(flatColors), 3));
 
 	geometry.computeBoundingSphere();
 
