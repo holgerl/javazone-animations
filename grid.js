@@ -6,11 +6,11 @@ function boilerPlate() {
 	var renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setClearColor(0x1D1D1D);
 	renderer.domElement.setAttribute('id', 'renderer');
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight*0.3);
 
 	var ratio = renderer.getContext().drawingBufferWidth / renderer.getContext().drawingBufferHeight;
 	
-	var camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 10000);
+	var camera = new THREE.PerspectiveCamera(30, ratio, 0.1, 10000);
 	camera.position.set(0, 2, 5)
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -46,9 +46,14 @@ function animate() {
 
 	var scrollSpeed = 0.010;
 	var wheelState = clamp(globals.wheelState, 0, 350);
-	var cameraHeight = 2 - wheelState * scrollSpeed;
+	//var cameraHeight = 2 - wheelState * scrollSpeed; 
+	var scrollToBottom = (window.innerHeight + window.scrollY) - document.body.offsetHeight;
+	scrollToBottom = Math.max(scrollToBottom, -100)
+	scrollToBottom = Math.min(scrollToBottom, 0);
+	scrollToBottom += 100;
+	var cameraHeight = -scrollToBottom / 50.0 - 0.5;
 	globals.camera.position.setY(cameraHeight);
-	globals.camera.lookAt(new THREE.Vector3(0, cameraHeight - 2, 0));
+	globals.camera.lookAt(new THREE.Vector3(0, cameraHeight - 4, 0));
 
 	render();
 }
