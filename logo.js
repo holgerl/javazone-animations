@@ -28,10 +28,11 @@ function boilerPlate() {
 function main() {
 	boilerPlate();
 
-	globals.logoSpinTime = 1;
+	globals.animationTime = 1;
 
 	var uniforms = {
-		time: {value: 0.0}
+		time: {value: 0.0},
+		whiteness: {value: 0.0}
 	};
 	globals.uniforms = uniforms;
 
@@ -48,6 +49,17 @@ function main() {
 	setupParameters();
 
 	mapEventsToState(globals, globals.renderer.domElement);
+
+	globals.animationType = -1;
+
+	globals.renderer.domElement.addEventListener("click", function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		if (globals.animationTime === 1) {
+			globals.animationType = randomInt(0, 3);
+			globals.animationTime = 0;
+		}
+	});
 
 	animate();
 }
@@ -136,22 +148,26 @@ function makePolygon(polygonPoints, material) {
 function animate() {
 	requestAnimationFrame(animate);
 
-	if (globals.mouseState.mouseDown && globals.logoSpinTime == 1) {
-		globals.logoSpinTime = 0;
+	if (globals.animationType == 0) {
+		var spinSpeed = 1/40;
+		globals.animationTime = Math.min(1, globals.animationTime + spinSpeed);
+		var easedSpinTime = easeWaveCubic(globals.animationTime);
+		globals.logo.rotation.y = easedSpinTime * Math.PI * 2;
+	} else if (globals.animationType == 1) {
+		let shakeSpeed = 1/25;
+		let shakeTimes = 4;
+		let amplitude = 0.15;
+		let shakeFalloff = 1.5;
+
+		globals.animationTime = Math.min(1, globals.animationTime + shakeSpeed);
+		globals.logo.position.setX(Math.sin(globals.animationTime * 2*Math.PI*shakeTimes) * amplitude * clamp(1 - globals.animationTime*shakeFalloff, 0, 1));
+	} else if (globals.animationType == 2) {
+		let blinkSpeed = 1/25;
+		
+		globals.animationTime = Math.min(1, globals.animationTime + blinkSpeed);
+		globals.uniforms.whiteness.value = 1 - clamp(easeWaveCubic(globals.animationTime), 0, 1);
 	}
-
-	var spinSpeed = 1/40;
-
-	//spinSpeed /= 10;
-
-	globals.logoSpinTime = Math.min(1, globals.logoSpinTime + spinSpeed);
-
-	var easedSpinTime = easeWaveCubic(globals.logoSpinTime);
 	
-	//easedSpinTime = globals.logoSpinTime;
-
-	globals.logo.rotation.y = easedSpinTime * Math.PI * 2;
-
 	render();
 }
 
@@ -186,7 +202,7 @@ function makeJavaZoneLogo() {
 	var colorB = new THREE.Color(0x4C7EFF);
 	var colorC = new THREE.Color(0x45FF62);
 	var colorD = new THREE.Color(0xEBC5B3);
-	var colorE = new THREE.Color(1,1,1);
+	var colorE = colorC;
 	var colorS = new THREE.Color(0x9E90FF);
 	var colorR = new THREE.Color(0xCC59FB);
 	var colorT = new THREE.Color(0xFE974D);

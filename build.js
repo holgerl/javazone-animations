@@ -46,7 +46,7 @@ function removeNonEmptyDirectory(directoryPath) {
     var time = new Date().getTime();
     //while (time + 500 > new Date().getTime()) ; // Waiting 500 ms beacuse unlinking files with unlinkSync is not entirely synchronous it appears
 
-    tryUntil(() => fs.rmdirSync(directoryPath), (e) => e.code === 'ENOTEMPTY');
+    tryUntil(() => fs.rmdirSync(directoryPath), (e) => e.code === 'ENOTEMPTY' || e.code === 'EBUSY');
 };
 
 function copyDirectoryRecursiveSync(src, dest) {

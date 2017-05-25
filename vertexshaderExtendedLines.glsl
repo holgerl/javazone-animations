@@ -9,6 +9,7 @@ varying float extension;
 varying float surfaceIndexToFragShader;
 attribute vec3 color;
 varying vec3 vertexColor;
+uniform float whiteness;
 
 void main() {
 	hue = pointLineDistance(position, vec3(-1, 0, 1), vec3(1, 0, -1));
@@ -18,8 +19,10 @@ void main() {
 	vec4 currentProjected  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
 	float thickness = lineWidth;
+	if (lineWidth > 0.5) thickness += whiteness; // TODO: Crazy hack to find out if shader is for the glow
+	else thickness += whiteness/10.0;
 
-	vertexColor = color;
+	vertexColor = color + whiteness/2.0;
 
 	extension = extensionDirection;
 	surfaceIndexToFragShader = surfaceIndex;
