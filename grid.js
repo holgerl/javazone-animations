@@ -39,14 +39,13 @@ function main() {
 	globals.renderer.domElement.addEventListener("click", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		const nofSquares = 10;
+		const nofSquares = 20;
 		for (let i = 0; i < nofSquares; i++) {
 			let squareIndex = randomInt(0, globals.squares.length);
 			let offset = Math.random()*1000;
 			globals.squares[squareIndex].blinkTime = new Date().getTime() + offset;		
 		}
 	});
-
 
 	animate();
 }
