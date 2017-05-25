@@ -19,6 +19,8 @@ vec3 hsv2rgb(vec3 c) {
 		lineWidth: {value: lineWidth}
 	}
 
+	Object.assign(localUniforms, globals.uniforms);
+
 	var material = new THREE.ShaderMaterial({
 		uniforms: localUniforms,
 		vertexShader: shaderUtil + `uniform float lineWidth;

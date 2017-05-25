@@ -7,6 +7,8 @@ function makeExtendedLinesMesh(linePoints, isClosedLoop, lineWidth, fragmentShad
 		lineWidth: {value: lineWidth}
 	}
 
+	Object.assign(localUniforms, globals.uniforms);
+
 	var material = new THREE.ShaderMaterial({
 		uniforms: localUniforms,
 		vertexShader: shaderUtil + `${vertexshaderExtendedLines.glsl}`,

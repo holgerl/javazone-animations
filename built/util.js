@@ -1,3 +1,4 @@
+// TODO: Call this Ease IN
 function easeWaveQuartic(t) {
 	t /= 1/2;
 	if (t < 1) return 1/2*t*t*t*t;
@@ -5,11 +6,17 @@ function easeWaveQuartic(t) {
 	return -1/2 * (t*t*t*t - 2);
 }
 
+
+// TODO: Call this Ease IN
 function easeWaveCubic(t) {
 	t /= 1/2;
 	if (t < 1) return 1/2*t*t*t;
 	t -= 2;
 	return 1/2*(t*t*t + 2);
+}
+
+function easeOut(easeInFunction, t) {
+	return easeInFunction(1 - t);
 }
 
 function flattenVectorArray(array) {
@@ -34,11 +41,12 @@ function arrayRotateRight(arr, reverse){
 }
 
 function mapEventsToState(stateObject, domElement) {
-	stateObject.mouseState = {mouseDown: false, mouseDownPosition: undefined, mousePosition: undefined};
+	stateObject.mouseState = {mouseDown: false, mouseDownPosition: undefined, mousePosition: undefined, mouseDownTime: undefined};
 	stateObject.wheelState = 0;
 
 	function mouseTouchDown(position) {
 		stateObject.mouseState.mouseDown = true;
+		stateObject.mouseState.mouseDownTime = new Date().getTime();
 		stateObject.mouseState.mouseDownPosition = position;
 		stateObject.mouseState.mousePosition = position;
 	}
@@ -65,4 +73,8 @@ function mapEventsToState(stateObject, domElement) {
 	domElement.addEventListener("wheel", function(e) {
 		stateObject.wheelState += e.deltaY;
 	});
+}
+
+function randomInt(from, to) {
+	return Math.floor(from + Math.random()*(to-from));
 }
