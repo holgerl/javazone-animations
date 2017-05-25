@@ -120,7 +120,7 @@ void main() {
 	float alpha = 1.0 - abs(extension);
 	alpha = clamp(alpha, 0.0, 1.0);
 	alpha = pow(alpha, 3.0);
-	alpha *= 0.5;
+	alpha *= 0.6;
 	if (surfaceIndexToFragShader == 2.0) {
 		//alpha = 0.0;
 	}

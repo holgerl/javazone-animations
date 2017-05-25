@@ -8,11 +8,11 @@ function boilerPlate() {
 	var renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setClearColor(0x1D1D1D);
 	renderer.domElement.setAttribute('id', 'renderer');
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(1000, 500);
 
-	var ratio = renderer.getContext().drawingBufferWidth / renderer.getContext().drawingBufferHeight;
+	var ratio = 2; //renderer.getContext().drawingBufferWidth / renderer.getContext().drawingBufferHeight;
 	
-	var camera = new THREE.PerspectiveCamera(60, ratio, 0.1, 10000);
+	var camera = new THREE.PerspectiveCamera(30, ratio, 0.1, 10000);
 	camera.position.set(0, 2, 8)
 	camera.lookAt(new THREE.Vector3(0, 2, 0));
 
@@ -111,7 +111,7 @@ void main() {
 	float alpha = 1.0 - abs(extension);
 	alpha = clamp(alpha, 0.0, 1.0);
 	alpha = pow(alpha, 3.0);
-	alpha *= 0.5;
+	alpha *= 0.6;
 	if (surfaceIndexToFragShader == 2.0) {
 		//alpha = 0.0;
 	}
@@ -227,21 +227,21 @@ function makeJavaZoneLogo() {
 	var V = new THREE.Vector3(-0.2, 0.15, 0.9);
 	var W = new THREE.Vector3(0.5, 0, -1);
 
-	var colorA = new THREE.Color(0.5,0,1);
-	var colorB = new THREE.Color(0,0,1);
-	var colorC = new THREE.Color(0,1,0);
-	var colorD = new THREE.Color(1,0.5,0.5);
+	var colorA = new THREE.Color(0xC764FF);
+	var colorB = new THREE.Color(0x4C7EFF);
+	var colorC = new THREE.Color(0x45FF62);
+	var colorD = new THREE.Color(0xEBC5B3);
 	var colorE = new THREE.Color(1,1,1);
-	var colorS = new THREE.Color(0,0.5,1);
-	var colorR = new THREE.Color(1,0,1);
-	var colorT = new THREE.Color(1,0.5,0);
-	var colorU = new THREE.Color(0.5,1,0);
-	var colorV = new THREE.Color(0.5,1,0.5);
+	var colorS = new THREE.Color(0x9E90FF);
+	var colorR = new THREE.Color(0xCC59FB);
+	var colorT = new THREE.Color(0xFE974D);
+	var colorU = new THREE.Color(0xBFBB53);
+	var colorV = colorC;
 	var colorW = new THREE.Color(0.5, 0.5, 0.5);
 
 	for (var color of [colorA, colorB, colorC, colorD, colorE, colorS, colorR, colorT, colorU, colorV, colorW]) {
 		//color.multiplyScalar(2.5);
-		color.addScalar(0.3);
+		color.addScalar(0.05);
 	}
 
 	var glowShader = globals.shaderUtil + `uniform float time;
@@ -258,7 +258,7 @@ void main() {
 	float alpha = 1.0 - abs(extension);
 	alpha = clamp(alpha, 0.0, 1.0);
 	alpha = pow(alpha, 3.0);
-	alpha *= 0.5;
+	alpha *= 0.6;
 	if (surfaceIndexToFragShader == 2.0) {
 		//alpha = 0.0;
 	}
@@ -280,8 +280,8 @@ void main() {
 	gl_FragColor = vec4(color.xyz, 1.0);
 }`;
 
-	var lineWidth = 0.05;
-	var glowWidth = 0.5;
+	var lineWidth = 0.085;
+	var glowWidth = 0.9;
 
 	var topLines1 = [A, B, D, C];
 	logo.add(makeExtendedLinesMesh(topLines1, true, lineWidth, lineShader, [colorA, colorB, colorD, colorC]));
