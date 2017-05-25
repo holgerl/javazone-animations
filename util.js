@@ -78,3 +78,26 @@ function mapEventsToState(stateObject, domElement) {
 function randomInt(from, to) {
 	return Math.floor(from + Math.random()*(to-from));
 }
+
+function integerArray(from, to) {
+	let array = [];
+	for (let i = from; i < to; i++) array.push(i);
+	return array;
+}
+
+function randomPermutation(array) {
+	let result = array.slice();
+	let length = array.length;
+
+	function swap(from, to) {
+		var temp = result[from];
+		result[from] = result[to];
+		result[to] = temp;
+	}
+
+	for (let i = 0; i < length; i++) {
+		swap(i, randomInt(0, i));
+	}
+
+	return result;
+}
