@@ -92,19 +92,26 @@ function animate() {
 
 	globals.uniforms.time.value = mouseDiff;
 
+	for (let pulse of globals.pulses) {
+		pulse.position.setX(-100);
+	}
+	for (let square of globals.squares) {
+		square.material.opacity = 0;
+		square.material.needsUpdate = true;
+	}
+
 	if (globals.animationType == 0) {
 		for (let i in globals.squares) {
 			let square = globals.squares[i];
-			square.material.opacity = 0;
 			if (square.blinkTime) {
 				let blinkDiff = new Date().getTime() - square.blinkTime;
 				if (blinkDiff > 0) {
 					let decay = 500;
 					let slowTime = clamp(blinkDiff/decay, 0, 1);
 					square.material.opacity = easeOut(easeWaveCubic, slowTime) * 0.9;
+					square.material.needsUpdate = true;
 				} 
 			}
-			square.material.needsUpdate = true;
 		}
 		globals.animationTime = Math.min(1, globals.animationTime + 0.01);
 
